@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo de Damas Online</title>
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -259,27 +256,20 @@
     </div>
 
     <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBk2xJQk2xJQk2xJQk2xJQk2xJQk2xJQk2x",
-            authDomain: "damas-online.firebaseapp.com",
-            databaseURL: "https://damas-online-default-rtdb.firebaseio.com",
-            projectId: "damas-online",
-            storageBucket: "damas-online.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:123456789"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Variáveis globais
+        // SIMULAÇÃO DE BANCO DE DADOS LOCAL
+        // Isso substitui o Firebase que estava com problemas
+        
+        let salas = {}; // Objeto para armazenar as salas em memória
+        
+        // Gerar ID único para cada jogador
         let meuId = 'jogador_' + Math.random().toString(36).substr(2, 9);
         let salaAtual = null;
         let minhaCor = null;
         let pecaSelecionada = null;
         let movimentosValidos = [];
+        
+        // Intervalo para verificar atualizações
+        let intervaloAtualizacao = null;
 
         // Função para criar sala com código de 4 dígitos
         function criarSala() {
@@ -289,13 +279,9 @@
             // Criar tabuleiro inicial
             let tabuleiroInicial = criarTabuleiro();
             
-            // Referência no Firebase
-            const salaRef = database.ref('salas/' + codigo);
-            
-            // Salvar dados da sala
-            salaRef.set({
+            // Criar objeto da sala
+            salas[codigo] = {
                 criador: meuId,
-                criadorNome: 'Jogador 1',
                 jogadores: {
                     jogador1: {
                         id: meuId,
@@ -305,22 +291,21 @@
                 },
                 status: 'aguardando',
                 tabuleiro: tabuleiroInicial,
-                vez: 'red',
-                createdAt: Date.now()
-            }).then(() => {
-                // Mostrar código da sala
-                salaAtual = codigo;
-                minhaCor = 'red';
-                
-                document.getElementById('codigoSala').textContent = codigo;
-                document.getElementById('salaCriada').classList.remove('hidden');
-                document.getElementById('entrarSala').classList.add('hidden');
-                
-                // Ouvir mudanças na sala
-                ouvirSala(codigo);
-            }).catch((error) => {
-                alert('Erro ao criar sala: ' + error.message);
-            });
+                vez: 'red'
+            };
+            
+            // Mostrar código da sala
+            salaAtual = codigo;
+            minhaCor = 'red';
+            
+            document.getElementById('codigoSala').textContent = codigo;
+            document.getElementById('salaCriada').classList.remove('hidden');
+            document.getElementById('entrarSala').classList.add('hidden');
+            
+            // Começar a verificar se alguém entrou na sala
+            verificarSala(codigo);
+            
+            alert('Sala criada com sucesso! Código: ' + codigo);
         }
 
         // Mostrar campo para entrar na sala
@@ -344,91 +329,72 @@
                 return;
             }
 
-            // Verificar se a sala existe
-            const salaRef = database.ref('salas/' + codigo);
-            salaRef.once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    const sala = snapshot.val();
+            // Verificar se a sala existe no objeto local
+            if (salas[codigo]) {
+                const sala = salas[codigo];
+                
+                // Verificar se a sala está disponível
+                if (sala.status === 'aguardando' && !sala.jogadores.jogador2) {
+                    // Adicionar jogador 2
+                    sala.jogadores.jogador2 = {
+                        id: meuId,
+                        nome: 'Jogador 2',
+                        cor: 'black'
+                    };
+                    sala.status = 'jogando';
                     
-                    // Verificar se a sala está disponível
-                    if (sala.status === 'aguardando' && !sala.jogadores.jogador2) {
-                        // Adicionar jogador 2
-                        salaRef.update({
-                            'jogadores/jogador2': {
-                                id: meuId,
-                                nome: 'Jogador 2',
-                                cor: 'black'
-                            },
-                            status: 'jogando'
-                        }).then(() => {
-                            salaAtual = codigo;
-                            minhaCor = 'black';
-                            
-                            // Esconder telas de criação/entrada
-                            document.getElementById('salaCriada').classList.add('hidden');
-                            document.getElementById('entrarSala').classList.add('hidden');
-                            
-                            // Ouvir mudanças na sala
-                            ouvirSala(codigo);
-                        }).catch((error) => {
-                            alert('Erro ao entrar na sala: ' + error.message);
-                        });
-                    } else {
-                        alert('Sala indisponível! Ela já pode estar cheia.');
-                    }
+                    salaAtual = codigo;
+                    minhaCor = 'black';
+                    
+                    // Esconder telas de criação/entrada
+                    document.getElementById('salaCriada').classList.add('hidden');
+                    document.getElementById('entrarSala').classList.add('hidden');
+                    
+                    // Mostrar jogo
+                    mostrarJogo(sala);
+                    
+                    alert('Você entrou na sala ' + codigo + '!');
                 } else {
-                    alert('Sala não encontrada! Verifique o código.');
+                    alert('Sala indisponível! Ela já pode estar cheia.');
                 }
-            }).catch((error) => {
-                alert('Erro ao verificar sala: ' + error.message);
-            });
+            } else {
+                alert('Sala não encontrada! Verifique o código.');
+            }
         }
 
-        // Função para ouvir mudanças na sala
-        function ouvirSala(codigo) {
-            const salaRef = database.ref('salas/' + codigo);
+        // Função para verificar se alguém entrou na sala (para quem criou)
+        function verificarSala(codigo) {
+            if (intervaloAtualizacao) {
+                clearInterval(intervaloAtualizacao);
+            }
             
-            salaRef.on('value', (snapshot) => {
-                const sala = snapshot.val();
-                if (!sala) {
-                    alert('Sala foi encerrada!');
-                    window.location.reload();
-                    return;
+            intervaloAtualizacao = setInterval(() => {
+                if (salas[codigo] && salas[codigo].status === 'jogando') {
+                    // Alguém entrou na sala!
+                    clearInterval(intervaloAtualizacao);
+                    mostrarJogo(salas[codigo]);
                 }
+            }, 1000);
+        }
 
-                // Mostrar área do jogo
-                document.getElementById('jogoArea').classList.remove('hidden');
-                
-                // Atualizar informações dos jogadores
-                if (sala.jogadores.jogador1) {
-                    document.getElementById('jogador1').innerHTML = '🟥 Jogador 1 (Vermelho)';
-                }
-                if (sala.jogadores.jogador2) {
-                    document.getElementById('jogador2').innerHTML = '⬛ Jogador 2 (Preto)';
-                }
-
-                // Atualizar status do jogo
-                if (sala.status === 'aguardando') {
-                    document.getElementById('status').innerHTML = '⏳ Aguardando segundo jogador...';
-                } else {
-                    let vezTexto = sala.vez === 'red' ? '🟥 VERMELHAS' : '⬛ PRETAS';
-                    document.getElementById('status').innerHTML = `Vez das peças: ${vezTexto}`;
-                    
-                    // Destacar jogador atual
-                    if (sala.vez === 'red') {
-                        document.getElementById('jogador1').classList.add('ativo');
-                        document.getElementById('jogador2').classList.remove('ativo');
-                    } else {
-                        document.getElementById('jogador2').classList.add('ativo');
-                        document.getElementById('jogador1').classList.remove('ativo');
-                    }
-                }
-
-                // Renderizar tabuleiro
-                if (sala.tabuleiro) {
-                    renderizarTabuleiro(sala.tabuleiro);
-                }
-            });
+        // Função para mostrar o jogo
+        function mostrarJogo(sala) {
+            document.getElementById('jogoArea').classList.remove('hidden');
+            document.getElementById('salaCriada').classList.add('hidden');
+            
+            // Atualizar informações dos jogadores
+            document.getElementById('jogador1').innerHTML = '🟥 Jogador 1 (Vermelho)';
+            document.getElementById('jogador2').innerHTML = '⬛ Jogador 2 (Preto)';
+            
+            // Atualizar status
+            document.getElementById('status').innerHTML = 'Vez das peças: 🟥 VERMELHAS';
+            
+            // Destacar jogador atual
+            document.getElementById('jogador1').classList.add('ativo');
+            document.getElementById('jogador2').classList.remove('ativo');
+            
+            // Renderizar tabuleiro
+            renderizarTabuleiro(sala.tabuleiro);
         }
 
         // Função para criar tabuleiro inicial
@@ -503,75 +469,92 @@
         function cliqueTabuleiro(linha, coluna) {
             if (!salaAtual) return;
             
-            const salaRef = database.ref('salas/' + salaAtual);
-            salaRef.once('value').then((snapshot) => {
-                const sala = snapshot.val();
-                if (!sala) return;
+            const sala = salas[salaAtual];
+            if (!sala) return;
 
-                // Verificar se é minha vez
-                if (sala.vez !== minhaCor) {
-                    alert('Agora não é sua vez!');
-                    return;
-                }
+            // Verificar se é minha vez
+            if (sala.vez !== minhaCor) {
+                alert('Agora não é sua vez!');
+                return;
+            }
 
-                // Verificar se os dois jogadores estão na sala
-                if (!sala.jogadores.jogador2) {
-                    alert('Aguardando segundo jogador...');
-                    return;
-                }
+            // Verificar se os dois jogadores estão na sala
+            if (!sala.jogadores.jogador2) {
+                alert('Aguardando segundo jogador...');
+                return;
+            }
 
-                const tabuleiro = sala.tabuleiro;
-                const peca = tabuleiro[linha][coluna];
+            const tabuleiro = sala.tabuleiro;
+            const peca = tabuleiro[linha][coluna];
 
-                // Se não tem peça selecionada, tenta selecionar uma peça
-                if (!pecaSelecionada) {
-                    if (peca && peca.cor === minhaCor) {
-                        pecaSelecionada = { linha, coluna };
-                        calcularMovimentosValidos(linha, coluna, tabuleiro);
-                        renderizarTabuleiro(tabuleiro);
-                    }
-                } 
-                // Se tem peça selecionada, tenta mover
-                else {
-                    if (movimentoValido(pecaSelecionada, { linha, coluna })) {
-                        // Fazer o movimento
-                        let novoTabuleiro = JSON.parse(JSON.stringify(tabuleiro));
-                        
-                        // Mover a peça
-                        novoTabuleiro[linha][coluna] = novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna];
-                        novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna] = null;
-
-                        // Verificar se houve captura
-                        if (Math.abs(linha - pecaSelecionada.linha) === 2) {
-                            let linhaCaptura = (pecaSelecionada.linha + linha) / 2;
-                            let colunaCaptura = (pecaSelecionada.coluna + coluna) / 2;
-                            novoTabuleiro[linhaCaptura][colunaCaptura] = null;
-                        }
-
-                        // Verificar se virou dama
-                        if (minhaCor === 'red' && linha === 7) {
-                            novoTabuleiro[linha][coluna].dama = true;
-                        }
-                        if (minhaCor === 'black' && linha === 0) {
-                            novoTabuleiro[linha][coluna].dama = true;
-                        }
-
-                        // Atualizar no Firebase
-                        salaRef.update({
-                            tabuleiro: novoTabuleiro,
-                            vez: minhaCor === 'red' ? 'black' : 'red'
-                        });
-
-                        pecaSelecionada = null;
-                        movimentosValidos = [];
-                    } else {
-                        // Se clicou em lugar inválido, desseleciona
-                        pecaSelecionada = null;
-                        movimentosValidos = [];
-                    }
+            // Se não tem peça selecionada, tenta selecionar uma peça
+            if (!pecaSelecionada) {
+                if (peca && peca.cor === minhaCor) {
+                    pecaSelecionada = { linha, coluna };
+                    calcularMovimentosValidos(linha, coluna, tabuleiro);
                     renderizarTabuleiro(tabuleiro);
                 }
-            });
+            } 
+            // Se tem peça selecionada, tenta mover
+            else {
+                if (movimentoValido(pecaSelecionada, { linha, coluna })) {
+                    // Fazer o movimento
+                    let novoTabuleiro = JSON.parse(JSON.stringify(tabuleiro));
+                    
+                    // Mover a peça
+                    novoTabuleiro[linha][coluna] = novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna];
+                    novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna] = null;
+
+                    // Verificar se houve captura
+                    if (Math.abs(linha - pecaSelecionada.linha) === 2) {
+                        let linhaCaptura = (pecaSelecionada.linha + linha) / 2;
+                        let colunaCaptura = (pecaSelecionada.coluna + coluna) / 2;
+                        novoTabuleiro[linhaCaptura][colunaCaptura] = null;
+                    }
+
+                    // Verificar se virou dama
+                    if (minhaCor === 'red' && linha === 7) {
+                        novoTabuleiro[linha][coluna].dama = true;
+                    }
+                    if (minhaCor === 'black' && linha === 0) {
+                        novoTabuleiro[linha][coluna].dama = true;
+                    }
+
+                    // Atualizar tabuleiro na sala
+                    sala.tabuleiro = novoTabuleiro;
+                    sala.vez = minhaCor === 'red' ? 'black' : 'red';
+
+                    // Atualizar interface
+                    atualizarInterface(sala);
+
+                    pecaSelecionada = null;
+                    movimentosValidos = [];
+                } else {
+                    // Se clicou em lugar inválido, desseleciona
+                    pecaSelecionada = null;
+                    movimentosValidos = [];
+                }
+                renderizarTabuleiro(tabuleiro);
+            }
+        }
+
+        // Função para atualizar interface
+        function atualizarInterface(sala) {
+            // Atualizar status
+            let vezTexto = sala.vez === 'red' ? '🟥 VERMELHAS' : '⬛ PRETAS';
+            document.getElementById('status').innerHTML = `Vez das peças: ${vezTexto}`;
+            
+            // Destacar jogador atual
+            if (sala.vez === 'red') {
+                document.getElementById('jogador1').classList.add('ativo');
+                document.getElementById('jogador2').classList.remove('ativo');
+            } else {
+                document.getElementById('jogador2').classList.add('ativo');
+                document.getElementById('jogador1').classList.remove('ativo');
+            }
+            
+            // Renderizar tabuleiro
+            renderizarTabuleiro(sala.tabuleiro);
         }
 
         // Função para calcular movimentos válidos
@@ -580,12 +563,12 @@
             const peca = tabuleiro[linha][coluna];
             if (!peca) return;
 
-            // Direções básicas (sem dama)
+            // Direções básicas
             let direcoes = [];
             if (peca.cor === 'red') {
-                direcoes = [[1, -1], [1, 1]]; // Vermelho anda para frente
+                direcoes = [[1, -1], [1, 1]];
             } else {
-                direcoes = [[-1, -1], [-1, 1]]; // Preto anda para frente
+                direcoes = [[-1, -1], [-1, 1]];
             }
 
             // Se for dama, pode andar em todas as direções
@@ -626,19 +609,6 @@
         function movimentoValido(de, para) {
             return movimentosValidos.some(m => m.linha === para.linha && m.coluna === para.coluna);
         }
-
-        // Limpar salas antigas (opcional)
-        function limparSalasAntigas() {
-            let limite = Date.now() - (60 * 60 * 1000); // 1 hora
-            database.ref('salas').orderByChild('createdAt').endAt(limite).once('value', (snapshot) => {
-                snapshot.forEach((child) => {
-                    child.ref.remove();
-                });
-            });
-        }
-
-        // Executar limpeza ao iniciar
-        limparSalasAntigas();
     </script>
 </body>
 </html>
