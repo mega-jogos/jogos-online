@@ -146,18 +146,38 @@
             border: 2px solid #000;
         }
 
+        .piece.king {
+            position: relative;
+        }
+
         .piece.king::after {
             content: "♔";
             color: gold;
             font-size: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .selected {
             box-shadow: 0 0 0 3px #ffd700;
+        }
+
+        .valid-move {
+            position: relative;
+        }
+
+        .valid-move::after {
+            content: "";
+            width: 30%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .status {
@@ -193,6 +213,11 @@
         .hidden {
             display: none;
         }
+
+        .aguardando {
+            color: #ffc107;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -200,40 +225,41 @@
         <h1>🎮 Jogo de Damas Online 🎮</h1>
         
         <div class="menu">
-            <button class="btn-criar" onclick="criarSala()">Criar Sala</button>
+            <button class="btn-criar" onclick="criarSala()">Criar Sala (Código 4 dígitos)</button>
             <button class="btn-entrar" onclick="mostrarEntrar()">Entrar na Sala</button>
         </div>
 
-        <!-- Área da Sala -->
+        <!-- Área da Sala Criada -->
         <div id="salaCriada" class="sala-section hidden">
-            <h3>Sala Criada!</h3>
-            <p>Compartilhe este código com seu amigo:</p>
+            <h3>✅ Sala Criada!</h3>
+            <p>Compartilhe este código de 4 dígitos com seu amigo:</p>
             <div class="codigo-display" id="codigoSala"></div>
-            <p>Aguardando oponente...</p>
+            <p class="aguardando" id="aguardandoMsg">⏳ Aguardando oponente entrar...</p>
         </div>
 
         <!-- Área para Entrar -->
         <div id="entrarSala" class="sala-section hidden">
-            <h3>Digite o código da sala:</h3>
-            <input type="text" class="input-codigo" id="inputCodigo" maxlength="4" placeholder="0000">
-            <button class="btn-entrar" onclick="entrarSala()" style="display: block; margin: 10px auto;">Entrar</button>
+            <h3>🔑 Digite o código da sala:</h3>
+            <input type="text" class="input-codigo" id="inputCodigo" maxlength="4" placeholder="0000" autocomplete="off">
+            <button class="btn-entrar" onclick="entrarSala()" style="display: block; margin: 10px auto;">Entrar na Sala</button>
+            <button onclick="voltarMenu()" style="margin-top: 10px; background: #6c757d; color: white;">Voltar</button>
         </div>
 
         <!-- Área do Jogo -->
         <div id="jogoArea" class="hidden">
             <div class="jogadores">
-                <div class="jogador" id="jogador1">Jogador 1 🟥</div>
-                <div class="jogador" id="jogador2">Jogador 2 ⬛</div>
+                <div class="jogador" id="jogador1">🟥 Jogador 1 (Vermelho)</div>
+                <div class="jogador" id="jogador2">⬛ Jogador 2 (Preto)</div>
             </div>
             
-            <div class="status" id="status">Aguardando jogadores...</div>
+            <div class="status" id="status">Carregando jogo...</div>
             
             <div class="board" id="board"></div>
         </div>
     </div>
 
     <script>
-        // Config Firebase
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBk2xJQk2xJQk2xJQk2xJQk2xJQk2xJQk2x",
             authDomain: "damas-online.firebaseapp.com",
@@ -244,100 +270,149 @@
             appId: "1:123456789:web:123456789"
         };
 
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let meuId = 'jogador_' + Math.random().toString(36).substr(2, 6);
+        // Variáveis globais
+        let meuId = 'jogador_' + Math.random().toString(36).substr(2, 9);
         let salaAtual = null;
         let minhaCor = null;
         let pecaSelecionada = null;
         let movimentosValidos = [];
 
-        // Criar sala com código de 4 dígitos
+        // Função para criar sala com código de 4 dígitos
         function criarSala() {
+            // Gerar código aleatório de 4 dígitos
             let codigo = Math.floor(1000 + Math.random() * 9000).toString();
             
+            // Criar tabuleiro inicial
+            let tabuleiroInicial = criarTabuleiro();
+            
+            // Referência no Firebase
             const salaRef = database.ref('salas/' + codigo);
+            
+            // Salvar dados da sala
             salaRef.set({
                 criador: meuId,
+                criadorNome: 'Jogador 1',
                 jogadores: {
-                    jogador1: { id: meuId, nome: 'Jogador 1', cor: 'red' }
+                    jogador1: {
+                        id: meuId,
+                        nome: 'Jogador 1',
+                        cor: 'red'
+                    }
                 },
                 status: 'aguardando',
-                tabuleiro: criarTabuleiro(),
-                vez: 'red'
+                tabuleiro: tabuleiroInicial,
+                vez: 'red',
+                createdAt: Date.now()
+            }).then(() => {
+                // Mostrar código da sala
+                salaAtual = codigo;
+                minhaCor = 'red';
+                
+                document.getElementById('codigoSala').textContent = codigo;
+                document.getElementById('salaCriada').classList.remove('hidden');
+                document.getElementById('entrarSala').classList.add('hidden');
+                
+                // Ouvir mudanças na sala
+                ouvirSala(codigo);
+            }).catch((error) => {
+                alert('Erro ao criar sala: ' + error.message);
             });
-
-            salaAtual = codigo;
-            minhaCor = 'red';
-            
-            document.getElementById('codigoSala').textContent = codigo;
-            document.getElementById('salaCriada').classList.remove('hidden');
-            document.getElementById('entrarSala').classList.add('hidden');
-            
-            ouvirSala(codigo);
         }
 
         // Mostrar campo para entrar na sala
         function mostrarEntrar() {
             document.getElementById('entrarSala').classList.remove('hidden');
             document.getElementById('salaCriada').classList.add('hidden');
+            document.getElementById('inputCodigo').value = '';
         }
 
-        // Entrar na sala
+        // Voltar ao menu
+        function voltarMenu() {
+            document.getElementById('entrarSala').classList.add('hidden');
+        }
+
+        // Função para entrar na sala
         function entrarSala() {
-            let codigo = document.getElementById('inputCodigo').value;
+            let codigo = document.getElementById('inputCodigo').value.trim();
             
             if (codigo.length !== 4) {
-                alert('Digite um código de 4 dígitos!');
+                alert('Digite um código válido de 4 dígitos!');
                 return;
             }
 
+            // Verificar se a sala existe
             const salaRef = database.ref('salas/' + codigo);
             salaRef.once('value').then((snapshot) => {
                 if (snapshot.exists()) {
                     const sala = snapshot.val();
+                    
+                    // Verificar se a sala está disponível
                     if (sala.status === 'aguardando' && !sala.jogadores.jogador2) {
+                        // Adicionar jogador 2
                         salaRef.update({
-                            'jogadores/jogador2': { id: meuId, nome: 'Jogador 2', cor: 'black' },
+                            'jogadores/jogador2': {
+                                id: meuId,
+                                nome: 'Jogador 2',
+                                cor: 'black'
+                            },
                             status: 'jogando'
+                        }).then(() => {
+                            salaAtual = codigo;
+                            minhaCor = 'black';
+                            
+                            // Esconder telas de criação/entrada
+                            document.getElementById('salaCriada').classList.add('hidden');
+                            document.getElementById('entrarSala').classList.add('hidden');
+                            
+                            // Ouvir mudanças na sala
+                            ouvirSala(codigo);
+                        }).catch((error) => {
+                            alert('Erro ao entrar na sala: ' + error.message);
                         });
-                        salaAtual = codigo;
-                        minhaCor = 'black';
-                        ouvirSala(codigo);
                     } else {
-                        alert('Sala indisponível!');
+                        alert('Sala indisponível! Ela já pode estar cheia.');
                     }
                 } else {
-                    alert('Sala não encontrada!');
+                    alert('Sala não encontrada! Verifique o código.');
                 }
+            }).catch((error) => {
+                alert('Erro ao verificar sala: ' + error.message);
             });
         }
 
-        // Ouvir mudanças na sala
+        // Função para ouvir mudanças na sala
         function ouvirSala(codigo) {
             const salaRef = database.ref('salas/' + codigo);
+            
             salaRef.on('value', (snapshot) => {
                 const sala = snapshot.val();
-                if (!sala) return;
+                if (!sala) {
+                    alert('Sala foi encerrada!');
+                    window.location.reload();
+                    return;
+                }
 
                 // Mostrar área do jogo
                 document.getElementById('jogoArea').classList.remove('hidden');
                 
                 // Atualizar informações dos jogadores
                 if (sala.jogadores.jogador1) {
-                    document.getElementById('jogador1').textContent = 'Jogador 1 🟥';
+                    document.getElementById('jogador1').innerHTML = '🟥 Jogador 1 (Vermelho)';
                 }
                 if (sala.jogadores.jogador2) {
-                    document.getElementById('jogador2').textContent = 'Jogador 2 ⬛';
+                    document.getElementById('jogador2').innerHTML = '⬛ Jogador 2 (Preto)';
                 }
 
-                // Atualizar status
+                // Atualizar status do jogo
                 if (sala.status === 'aguardando') {
-                    document.getElementById('status').textContent = 'Aguardando segundo jogador...';
+                    document.getElementById('status').innerHTML = '⏳ Aguardando segundo jogador...';
                 } else {
-                    let vezTexto = sala.vez === 'red' ? 'Vermelhas' : 'Pretas';
-                    document.getElementById('status').textContent = `Vez das peças ${vezTexto}`;
+                    let vezTexto = sala.vez === 'red' ? '🟥 VERMELHAS' : '⬛ PRETAS';
+                    document.getElementById('status').innerHTML = `Vez das peças: ${vezTexto}`;
                     
                     // Destacar jogador atual
                     if (sala.vez === 'red') {
@@ -356,9 +431,11 @@
             });
         }
 
-        // Criar tabuleiro inicial
+        // Função para criar tabuleiro inicial
         function criarTabuleiro() {
             let tabuleiro = [];
+            
+            // Inicializar tabuleiro vazio
             for (let i = 0; i < 8; i++) {
                 tabuleiro[i] = [];
                 for (let j = 0; j < 8; j++) {
@@ -366,20 +443,20 @@
                 }
             }
 
-            // Peças vermelhas (topo)
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 8; j++) {
-                    if ((i + j) % 2 === 1) {
-                        tabuleiro[i][j] = { cor: 'red', dama: false };
+            // Posicionar peças vermelhas (parte de cima)
+            for (let linha = 0; linha < 3; linha++) {
+                for (let coluna = 0; coluna < 8; coluna++) {
+                    if ((linha + coluna) % 2 === 1) {
+                        tabuleiro[linha][coluna] = { cor: 'red', dama: false };
                     }
                 }
             }
 
-            // Peças pretas (base)
-            for (let i = 5; i < 8; i++) {
-                for (let j = 0; j < 8; j++) {
-                    if ((i + j) % 2 === 1) {
-                        tabuleiro[i][j] = { cor: 'black', dama: false };
+            // Posicionar peças pretas (parte de baixo)
+            for (let linha = 5; linha < 8; linha++) {
+                for (let coluna = 0; coluna < 8; coluna++) {
+                    if ((linha + coluna) % 2 === 1) {
+                        tabuleiro[linha][coluna] = { cor: 'black', dama: false };
                     }
                 }
             }
@@ -387,19 +464,19 @@
             return tabuleiro;
         }
 
-        // Renderizar tabuleiro
+        // Função para renderizar tabuleiro
         function renderizarTabuleiro(tabuleiro) {
             const boardElement = document.getElementById('board');
             boardElement.innerHTML = '';
 
-            for (let i = 0; i < 8; i++) {
-                for (let j = 0; j < 8; j++) {
+            for (let linha = 0; linha < 8; linha++) {
+                for (let coluna = 0; coluna < 8; coluna++) {
                     const square = document.createElement('div');
-                    square.className = `square ${(i + j) % 2 === 0 ? 'light' : 'dark'}`;
-                    square.dataset.linha = i;
-                    square.dataset.coluna = j;
+                    square.className = `square ${(linha + coluna) % 2 === 0 ? 'light' : 'dark'}`;
+                    square.dataset.linha = linha;
+                    square.dataset.coluna = coluna;
 
-                    const peca = tabuleiro[i][j];
+                    const peca = tabuleiro[linha][coluna];
                     if (peca) {
                         const pecaElement = document.createElement('div');
                         pecaElement.className = `piece ${peca.cor} ${peca.dama ? 'king' : ''}`;
@@ -407,53 +484,75 @@
                     }
 
                     // Destacar peça selecionada
-                    if (pecaSelecionada && pecaSelecionada.linha === i && pecaSelecionada.coluna === j) {
+                    if (pecaSelecionada && pecaSelecionada.linha === linha && pecaSelecionada.coluna === coluna) {
                         square.classList.add('selected');
                     }
 
-                    square.onclick = () => cliqueTabuleiro(i, j);
+                    // Destacar movimentos válidos
+                    if (movimentosValidos.some(m => m.linha === linha && m.coluna === coluna)) {
+                        square.classList.add('valid-move');
+                    }
+
+                    square.onclick = () => cliqueTabuleiro(linha, coluna);
                     boardElement.appendChild(square);
                 }
             }
         }
 
-        // Clique no tabuleiro
+        // Função para clique no tabuleiro
         function cliqueTabuleiro(linha, coluna) {
+            if (!salaAtual) return;
+            
             const salaRef = database.ref('salas/' + salaAtual);
             salaRef.once('value').then((snapshot) => {
                 const sala = snapshot.val();
                 if (!sala) return;
 
                 // Verificar se é minha vez
-                if (sala.vez !== minhaCor) return;
+                if (sala.vez !== minhaCor) {
+                    alert('Agora não é sua vez!');
+                    return;
+                }
+
+                // Verificar se os dois jogadores estão na sala
+                if (!sala.jogadores.jogador2) {
+                    alert('Aguardando segundo jogador...');
+                    return;
+                }
 
                 const tabuleiro = sala.tabuleiro;
                 const peca = tabuleiro[linha][coluna];
 
-                // Selecionar peça
-                if (!pecaSelecionada && peca && peca.cor === minhaCor) {
-                    pecaSelecionada = { linha, coluna };
-                    calcularMovimentos(linha, coluna, tabuleiro);
-                    renderizarTabuleiro(tabuleiro);
-                }
-                // Mover peça
-                else if (pecaSelecionada) {
+                // Se não tem peça selecionada, tenta selecionar uma peça
+                if (!pecaSelecionada) {
+                    if (peca && peca.cor === minhaCor) {
+                        pecaSelecionada = { linha, coluna };
+                        calcularMovimentosValidos(linha, coluna, tabuleiro);
+                        renderizarTabuleiro(tabuleiro);
+                    }
+                } 
+                // Se tem peça selecionada, tenta mover
+                else {
                     if (movimentoValido(pecaSelecionada, { linha, coluna })) {
+                        // Fazer o movimento
                         let novoTabuleiro = JSON.parse(JSON.stringify(tabuleiro));
                         
-                        // Mover peça
+                        // Mover a peça
                         novoTabuleiro[linha][coluna] = novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna];
                         novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna] = null;
 
-                        // Verificar captura
+                        // Verificar se houve captura
                         if (Math.abs(linha - pecaSelecionada.linha) === 2) {
-                            let capturaLinha = (pecaSelecionada.linha + linha) / 2;
-                            let capturaColuna = (pecaSelecionada.coluna + coluna) / 2;
-                            novoTabuleiro[capturaLinha][capturaColuna] = null;
+                            let linhaCaptura = (pecaSelecionada.linha + linha) / 2;
+                            let colunaCaptura = (pecaSelecionada.coluna + coluna) / 2;
+                            novoTabuleiro[linhaCaptura][colunaCaptura] = null;
                         }
 
-                        // Verificar dama
-                        if ((minhaCor === 'red' && linha === 7) || (minhaCor === 'black' && linha === 0)) {
+                        // Verificar se virou dama
+                        if (minhaCor === 'red' && linha === 7) {
+                            novoTabuleiro[linha][coluna].dama = true;
+                        }
+                        if (minhaCor === 'black' && linha === 0) {
                             novoTabuleiro[linha][coluna].dama = true;
                         }
 
@@ -466,6 +565,7 @@
                         pecaSelecionada = null;
                         movimentosValidos = [];
                     } else {
+                        // Se clicou em lugar inválido, desseleciona
                         pecaSelecionada = null;
                         movimentosValidos = [];
                     }
@@ -474,33 +574,71 @@
             });
         }
 
-        // Calcular movimentos válidos
-        function calcularMovimentos(linha, coluna, tabuleiro) {
+        // Função para calcular movimentos válidos
+        function calcularMovimentosValidos(linha, coluna, tabuleiro) {
             movimentosValidos = [];
             const peca = tabuleiro[linha][coluna];
             if (!peca) return;
 
-            const direcoes = peca.cor === 'red' ? [[1, -1], [1, 1]] : [[-1, -1], [-1, 1]];
-            if (peca.dama) {
-                direcoes.push([-1, -1], [-1, 1], [1, -1], [1, 1]);
+            // Direções básicas (sem dama)
+            let direcoes = [];
+            if (peca.cor === 'red') {
+                direcoes = [[1, -1], [1, 1]]; // Vermelho anda para frente
+            } else {
+                direcoes = [[-1, -1], [-1, 1]]; // Preto anda para frente
             }
 
+            // Se for dama, pode andar em todas as direções
+            if (peca.dama) {
+                direcoes = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+            }
+
+            // Verificar cada direção
             direcoes.forEach(([dLinha, dColuna]) => {
                 let novaLinha = linha + dLinha;
                 let novaColuna = coluna + dColuna;
 
+                // Movimento simples
                 if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
                     if (!tabuleiro[novaLinha][novaColuna]) {
                         movimentosValidos.push({ linha: novaLinha, coluna: novaColuna });
                     }
                 }
+
+                // Captura
+                let linhaPulo = linha + (dLinha * 2);
+                let colunaPulo = coluna + (dColuna * 2);
+                let linhaMeio = linha + dLinha;
+                let colunaMeio = coluna + dColuna;
+
+                if (linhaPulo >= 0 && linhaPulo < 8 && colunaPulo >= 0 && colunaPulo < 8) {
+                    let pecaMeio = tabuleiro[linhaMeio][colunaMeio];
+                    let pecaDestino = tabuleiro[linhaPulo][colunaPulo];
+                    
+                    if (pecaMeio && pecaMeio.cor !== peca.cor && !pecaDestino) {
+                        movimentosValidos.push({ linha: linhaPulo, coluna: colunaPulo });
+                    }
+                }
             });
         }
 
-        // Verificar se movimento é válido
+        // Função para verificar se movimento é válido
         function movimentoValido(de, para) {
             return movimentosValidos.some(m => m.linha === para.linha && m.coluna === para.coluna);
         }
+
+        // Limpar salas antigas (opcional)
+        function limparSalasAntigas() {
+            let limite = Date.now() - (60 * 60 * 1000); // 1 hora
+            database.ref('salas').orderByChild('createdAt').endAt(limite).once('value', (snapshot) => {
+                snapshot.forEach((child) => {
+                    child.ref.remove();
+                });
+            });
+        }
+
+        // Executar limpeza ao iniciar
+        limparSalasAntigas();
     </script>
 </body>
 </html>
