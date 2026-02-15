@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Damas - Apostas Online</title>
-    <!-- Firebase SDK -->
+    <title>Jogo de Damas Online</title>
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -12,11 +12,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,215 +25,83 @@
         }
 
         .container {
-            max-width: 1400px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 600px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .game-layout {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 20px;
-        }
-
-        /* Painel Lateral */
-        .side-panel {
-            background: #f5f5f5;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .player-info {
-            text-align: center;
             margin-bottom: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
         }
 
-        .player-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0 auto 10px;
+        .menu {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .player-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .player-status {
-            color: #28a745;
-            font-size: 0.9em;
-        }
-
-        /* Menu Principal */
-        .menu-section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
+            gap: 10px;
             margin-bottom: 20px;
+            justify-content: center;
         }
 
-        .menu-title {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 15px;
-            font-weight: bold;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 5px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
+        button {
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 1em;
+            border-radius: 5px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
+        .btn-criar {
             background: #28a745;
             color: white;
         }
 
-        .btn-success:hover {
+        .btn-criar:hover {
             background: #218838;
         }
 
-        .btn-warning {
-            background: #ffc107;
-            color: #333;
-        }
-
-        .btn-info {
-            background: #17a2b8;
+        .btn-entrar {
+            background: #007bff;
             color: white;
         }
 
-        /* Código da Partida */
-        .game-code-display {
-            background: #333;
-            color: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 15px;
+        .btn-entrar:hover {
+            background: #0056b3;
         }
 
-        .game-code {
-            font-size: 2em;
-            font-weight: bold;
-            letter-spacing: 5px;
-            font-family: monospace;
-        }
-
-        .code-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1.1em;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* Opções de Aposta */
-        .bet-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .bet-option {
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .bet-option.selected {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        .bet-option:hover {
-            border-color: #667eea;
-        }
-
-        .bet-amount {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #28a745;
-        }
-
-        /* Opções de Formato */
-        .format-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .format-option {
-            flex: 1;
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .format-option.selected {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        /* Tabuleiro */
-        .board-container {
+        .sala-section {
             background: #f5f5f5;
-            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .codigo-display {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 10px;
+            color: #333;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 2px dashed #007bff;
+        }
+
+        .input-codigo {
+            width: 200px;
+            padding: 10px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
         }
 
         .board {
@@ -242,8 +110,7 @@
             aspect-ratio: 1;
             background: #deb887;
             border: 3px solid #8b4513;
-            border-radius: 5px;
-            overflow: hidden;
+            margin-bottom: 20px;
         }
 
         .square {
@@ -252,7 +119,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            position: relative;
         }
 
         .square.dark {
@@ -267,166 +133,61 @@
             width: 80%;
             height: 80%;
             border-radius: 50%;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .piece.red {
-            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-            border: 2px solid #990000;
+            background: #ff4444;
+            border: 2px solid #cc0000;
         }
 
         .piece.black {
-            background: linear-gradient(135deg, #333333 0%, #000000 100%);
-            border: 2px solid #222;
-        }
-
-        .piece.king {
-            position: relative;
+            background: #333;
+            border: 2px solid #000;
         }
 
         .piece.king::after {
             content: "♔";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             color: gold;
-            font-size: 1.2em;
-            text-shadow: 1px 1px 2px black;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
         }
 
         .selected {
             box-shadow: 0 0 0 3px #ffd700;
         }
 
-        .valid-move {
-            position: relative;
-        }
-
-        .valid-move::after {
-            content: "";
-            position: absolute;
-            width: 30%;
-            height: 30%;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Chat */
-        .chat-container {
-            background: #f5f5f5;
-            border-radius: 15px;
-            padding: 20px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            max-height: 400px;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            background: #e9ecef;
-        }
-
-        .message .sender {
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 3px;
-        }
-
-        .message .time {
-            font-size: 0.7em;
-            color: #999;
-            float: right;
-        }
-
-        .message.own-message {
-            background: #d4edda;
-            margin-left: 20px;
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-        }
-
-        /* Modal PIX */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .pix-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 1em;
-        }
-
-        /* Status do Jogo */
-        .game-status {
+        .status {
             text-align: center;
-            margin-top: 15px;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
+            font-size: 18px;
             font-weight: bold;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            margin-bottom: 10px;
         }
 
-        .winner-message {
-            color: #28a745;
-            font-size: 1.2em;
+        .jogadores {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
-        /* Responsividade */
-        @media (max-width: 1024px) {
-            .game-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .board-container {
-                order: -1;
-            }
+        .jogador {
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            flex: 1;
+            margin: 0 5px;
+            text-align: center;
+        }
+
+        .jogador.ativo {
+            background: #28a745;
+            color: white;
         }
 
         .hidden {
@@ -436,99 +197,43 @@
 </head>
 <body>
     <div class="container">
-        <h1>♟️ Jogo de Damas com Apostas ♟️</h1>
+        <h1>🎮 Jogo de Damas Online 🎮</h1>
         
-        <div class="game-layout">
-            <!-- Painel Esquerdo -->
-            <div class="side-panel">
-                <div class="player-info">
-                    <div class="player-avatar" id="playerAvatar">J1</div>
-                    <div class="player-name" id="playerName">Jogador 1</div>
-                    <div class="player-status" id="playerStatus">Online</div>
-                </div>
-
-                <div class="menu-section">
-                    <div class="menu-title">Menu Principal</div>
-                    <button class="btn btn-primary" onclick="createGame()">Criar Nova Partida</button>
-                    <button class="btn btn-success" onclick="showJoinGame()">Entrar em Partida</button>
-                    <button class="btn btn-info" onclick="findRandomGame()">Jogador Aleatório</button>
-                    <button class="btn btn-warning" onclick="playAgainstAI()">Jogar contra Máquina</button>
-                </div>
-
-                <div id="gameCodeSection" class="hidden">
-                    <div class="game-code-display">
-                        <div>Código da Partida:</div>
-                        <div class="game-code" id="gameCode">XXXXXX</div>
-                    </div>
-                </div>
-
-                <div id="joinGameSection" class="hidden">
-                    <input type="text" class="code-input" id="joinCode" placeholder="Digite o código" maxlength="6">
-                    <button class="btn btn-primary" onclick="joinGame()">Entrar</button>
-                </div>
-
-                <div id="bettingSection" class="hidden">
-                    <div class="menu-title">Configurar Aposta</div>
-                    <div class="bet-options">
-                        <div class="bet-option" onclick="selectBet(2)">
-                            <div class="bet-amount">R$ 2</div>
-                        </div>
-                        <div class="bet-option" onclick="selectBet(5)">
-                            <div class="bet-amount">R$ 5</div>
-                        </div>
-                        <div class="bet-option" onclick="selectBet(10)">
-                            <div class="bet-amount">R$ 10</div>
-                        </div>
-                    </div>
-                    <div class="format-options">
-                        <div class="format-option" onclick="selectFormat('single')">
-                            <div>Melhor de 1</div>
-                        </div>
-                        <div class="format-option" onclick="selectFormat('bestOf3')">
-                            <div>Melhor de 3</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="confirmBet()">Confirmar Aposta</button>
-                </div>
-
-                <div id="matchInfo" class="game-status">
-                    <div>Aguardando jogadores...</div>
-                </div>
-            </div>
-
-            <!-- Tabuleiro Central -->
-            <div class="board-container">
-                <div class="board" id="board"></div>
-                <div class="game-status" id="gameStatus">
-                    <span id="turnIndicator">Vez das peças vermelhas</span>
-                </div>
-            </div>
-
-            <!-- Chat Direito -->
-            <div class="chat-container">
-                <div class="menu-title">Chat da Partida</div>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Digite sua mensagem..." onkeypress="handleChatKeyPress(event)">
-                    <button class="btn btn-primary" onclick="sendMessage()" style="width: auto;">Enviar</button>
-                </div>
-            </div>
+        <div class="menu">
+            <button class="btn-criar" onclick="criarSala()">Criar Sala</button>
+            <button class="btn-entrar" onclick="mostrarEntrar()">Entrar na Sala</button>
         </div>
-    </div>
 
-    <!-- Modal PIX -->
-    <div class="modal" id="pixModal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 20px;">🏆 Parabéns! Você venceu! 🏆</h3>
-            <p>Insira sua chave PIX para receber o pagamento:</p>
-            <input type="text" class="pix-input" id="pixKey" placeholder="CPF, email, telefone ou chave aleatória">
-            <button class="btn btn-success" onclick="submitPix()">Confirmar Chave PIX</button>
-            <button class="btn btn-warning" style="margin-top: 10px;" onclick="closePixModal()">Fechar</button>
+        <!-- Área da Sala -->
+        <div id="salaCriada" class="sala-section hidden">
+            <h3>Sala Criada!</h3>
+            <p>Compartilhe este código com seu amigo:</p>
+            <div class="codigo-display" id="codigoSala"></div>
+            <p>Aguardando oponente...</p>
+        </div>
+
+        <!-- Área para Entrar -->
+        <div id="entrarSala" class="sala-section hidden">
+            <h3>Digite o código da sala:</h3>
+            <input type="text" class="input-codigo" id="inputCodigo" maxlength="4" placeholder="0000">
+            <button class="btn-entrar" onclick="entrarSala()" style="display: block; margin: 10px auto;">Entrar</button>
+        </div>
+
+        <!-- Área do Jogo -->
+        <div id="jogoArea" class="hidden">
+            <div class="jogadores">
+                <div class="jogador" id="jogador1">Jogador 1 🟥</div>
+                <div class="jogador" id="jogador2">Jogador 2 ⬛</div>
+            </div>
+            
+            <div class="status" id="status">Aguardando jogadores...</div>
+            
+            <div class="board" id="board"></div>
         </div>
     </div>
 
     <script>
-        // Configuração do Firebase
+        // Config Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBk2xJQk2xJQk2xJQk2xJQk2xJQk2xJQk2x",
             authDomain: "damas-online.firebaseapp.com",
@@ -539,527 +244,263 @@
             appId: "1:123456789:web:123456789"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Variáveis globais
-        let currentPlayer = {
-            id: generatePlayerId(),
-            name: 'Jogador ' + Math.floor(Math.random() * 1000),
-            color: null
-        };
-        
-        let currentGame = null;
-        let selectedPiece = null;
-        let validMoves = [];
-        let betAmount = 0;
-        let gameFormat = 'single';
-        let gameScore = { player1: 0, player2: 0 };
-        let aiMode = false;
-        let aiDifficulty = 'medium';
+        let meuId = 'jogador_' + Math.random().toString(36).substr(2, 6);
+        let salaAtual = null;
+        let minhaCor = null;
+        let pecaSelecionada = null;
+        let movimentosValidos = [];
 
-        // Gerar ID único para o jogador
-        function generatePlayerId() {
-            return 'player_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Criar nova partida
-        function createGame() {
-            const gameCode = generateGameCode();
-            const gameRef = database.ref('games/' + gameCode);
+        // Criar sala com código de 4 dígitos
+        function criarSala() {
+            let codigo = Math.floor(1000 + Math.random() * 9000).toString();
             
-            const gameData = {
-                code: gameCode,
-                players: {
-                    player1: {
-                        id: currentPlayer.id,
-                        name: currentPlayer.name,
-                        ready: false
-                    }
+            const salaRef = database.ref('salas/' + codigo);
+            salaRef.set({
+                criador: meuId,
+                jogadores: {
+                    jogador1: { id: meuId, nome: 'Jogador 1', cor: 'red' }
                 },
-                status: 'waiting',
-                board: initializeBoard(),
-                currentTurn: 'red',
-                bet: null,
-                format: null,
-                chat: [],
-                createdAt: Date.now()
-            };
+                status: 'aguardando',
+                tabuleiro: criarTabuleiro(),
+                vez: 'red'
+            });
+
+            salaAtual = codigo;
+            minhaCor = 'red';
             
-            gameRef.set(gameData);
-            currentGame = gameCode;
+            document.getElementById('codigoSala').textContent = codigo;
+            document.getElementById('salaCriada').classList.remove('hidden');
+            document.getElementById('entrarSala').classList.add('hidden');
             
-            document.getElementById('gameCode').textContent = gameCode;
-            document.getElementById('gameCodeSection').classList.remove('hidden');
-            document.getElementById('joinGameSection').classList.add('hidden');
-            
-            listenToGame(gameCode);
+            ouvirSala(codigo);
         }
 
-        // Gerar código aleatório
-        function generateGameCode() {
-            return Math.random().toString(36).substr(2, 6).toUpperCase();
+        // Mostrar campo para entrar na sala
+        function mostrarEntrar() {
+            document.getElementById('entrarSala').classList.remove('hidden');
+            document.getElementById('salaCriada').classList.add('hidden');
         }
 
-        // Mostrar seção de entrada
-        function showJoinGame() {
-            document.getElementById('joinGameSection').classList.remove('hidden');
-            document.getElementById('gameCodeSection').classList.add('hidden');
-        }
-
-        // Entrar em partida
-        function joinGame() {
-            const gameCode = document.getElementById('joinCode').value.toUpperCase();
-            if (!gameCode) return;
+        // Entrar na sala
+        function entrarSala() {
+            let codigo = document.getElementById('inputCodigo').value;
             
-            const gameRef = database.ref('games/' + gameCode);
-            gameRef.once('value').then((snapshot) => {
+            if (codigo.length !== 4) {
+                alert('Digite um código de 4 dígitos!');
+                return;
+            }
+
+            const salaRef = database.ref('salas/' + codigo);
+            salaRef.once('value').then((snapshot) => {
                 if (snapshot.exists()) {
-                    const game = snapshot.val();
-                    if (game.status === 'waiting' && !game.players.player2) {
-                        gameRef.update({
-                            'players/player2': {
-                                id: currentPlayer.id,
-                                name: currentPlayer.name,
-                                ready: false
-                            },
-                            status: 'ready'
+                    const sala = snapshot.val();
+                    if (sala.status === 'aguardando' && !sala.jogadores.jogador2) {
+                        salaRef.update({
+                            'jogadores/jogador2': { id: meuId, nome: 'Jogador 2', cor: 'black' },
+                            status: 'jogando'
                         });
-                        currentGame = gameCode;
-                        listenToGame(gameCode);
+                        salaAtual = codigo;
+                        minhaCor = 'black';
+                        ouvirSala(codigo);
                     } else {
-                        alert('Partida não disponível!');
+                        alert('Sala indisponível!');
                     }
                 } else {
-                    alert('Código inválido!');
+                    alert('Sala não encontrada!');
                 }
             });
         }
 
-        // Encontrar jogador aleatório
-        function findRandomGame() {
-            database.ref('games').orderByChild('status').equalTo('waiting').limitToFirst(1).once('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const games = snapshot.val();
-                    const gameCode = Object.keys(games)[0];
-                    document.getElementById('joinCode').value = gameCode;
-                    joinGame();
+        // Ouvir mudanças na sala
+        function ouvirSala(codigo) {
+            const salaRef = database.ref('salas/' + codigo);
+            salaRef.on('value', (snapshot) => {
+                const sala = snapshot.val();
+                if (!sala) return;
+
+                // Mostrar área do jogo
+                document.getElementById('jogoArea').classList.remove('hidden');
+                
+                // Atualizar informações dos jogadores
+                if (sala.jogadores.jogador1) {
+                    document.getElementById('jogador1').textContent = 'Jogador 1 🟥';
+                }
+                if (sala.jogadores.jogador2) {
+                    document.getElementById('jogador2').textContent = 'Jogador 2 ⬛';
+                }
+
+                // Atualizar status
+                if (sala.status === 'aguardando') {
+                    document.getElementById('status').textContent = 'Aguardando segundo jogador...';
                 } else {
-                    createGame();
+                    let vezTexto = sala.vez === 'red' ? 'Vermelhas' : 'Pretas';
+                    document.getElementById('status').textContent = `Vez das peças ${vezTexto}`;
+                    
+                    // Destacar jogador atual
+                    if (sala.vez === 'red') {
+                        document.getElementById('jogador1').classList.add('ativo');
+                        document.getElementById('jogador2').classList.remove('ativo');
+                    } else {
+                        document.getElementById('jogador2').classList.add('ativo');
+                        document.getElementById('jogador1').classList.remove('ativo');
+                    }
+                }
+
+                // Renderizar tabuleiro
+                if (sala.tabuleiro) {
+                    renderizarTabuleiro(sala.tabuleiro);
                 }
             });
         }
 
-        // Jogar contra máquina
-        function playAgainstAI() {
-            aiMode = true;
-            currentGame = 'AI_GAME';
-            initializeAIGame();
-        }
+        // Criar tabuleiro inicial
+        function criarTabuleiro() {
+            let tabuleiro = [];
+            for (let i = 0; i < 8; i++) {
+                tabuleiro[i] = [];
+                for (let j = 0; j < 8; j++) {
+                    tabuleiro[i][j] = null;
+                }
+            }
 
-        // Inicializar jogo contra IA
-        function initializeAIGame() {
-            document.getElementById('bettingSection').classList.remove('hidden');
-            document.getElementById('gameStatus').innerHTML = 'Modo: Contra Máquina';
-            renderBoard(initializeBoard());
-        }
-
-        // Inicializar tabuleiro
-        function initializeBoard() {
-            const board = Array(8).fill().map(() => Array(8).fill(null));
-            
-            // Posicionar peças vermelhas
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 8; col++) {
-                    if ((row + col) % 2 === 1) {
-                        board[row][col] = { color: 'red', king: false };
+            // Peças vermelhas (topo)
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if ((i + j) % 2 === 1) {
+                        tabuleiro[i][j] = { cor: 'red', dama: false };
                     }
                 }
             }
-            
-            // Posicionar peças pretas
-            for (let row = 5; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    if ((row + col) % 2 === 1) {
-                        board[row][col] = { color: 'black', king: false };
+
+            // Peças pretas (base)
+            for (let i = 5; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if ((i + j) % 2 === 1) {
+                        tabuleiro[i][j] = { cor: 'black', dama: false };
                     }
                 }
             }
-            
-            return board;
+
+            return tabuleiro;
         }
 
         // Renderizar tabuleiro
-        function renderBoard(board) {
+        function renderizarTabuleiro(tabuleiro) {
             const boardElement = document.getElementById('board');
             boardElement.innerHTML = '';
-            
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
+
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
                     const square = document.createElement('div');
-                    square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-                    square.dataset.row = row;
-                    square.dataset.col = col;
-                    
-                    const piece = board[row][col];
-                    if (piece) {
-                        const pieceElement = document.createElement('div');
-                        pieceElement.className = `piece ${piece.color} ${piece.king ? 'king' : ''}`;
-                        square.appendChild(pieceElement);
+                    square.className = `square ${(i + j) % 2 === 0 ? 'light' : 'dark'}`;
+                    square.dataset.linha = i;
+                    square.dataset.coluna = j;
+
+                    const peca = tabuleiro[i][j];
+                    if (peca) {
+                        const pecaElement = document.createElement('div');
+                        pecaElement.className = `piece ${peca.cor} ${peca.dama ? 'king' : ''}`;
+                        square.appendChild(pecaElement);
                     }
-                    
+
                     // Destacar peça selecionada
-                    if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+                    if (pecaSelecionada && pecaSelecionada.linha === i && pecaSelecionada.coluna === j) {
                         square.classList.add('selected');
                     }
-                    
-                    // Destacar movimentos válidos
-                    if (validMoves.some(move => move.row === row && move.col === col)) {
-                        square.classList.add('valid-move');
-                    }
-                    
-                    square.onclick = () => handleSquareClick(row, col, board);
+
+                    square.onclick = () => cliqueTabuleiro(i, j);
                     boardElement.appendChild(square);
                 }
             }
         }
 
-        // Lidar com clique no tabuleiro
-        function handleSquareClick(row, col, board) {
-            if (aiMode) {
-                handleAIMove(row, col, board);
-            } else if (currentGame) {
-                handleOnlineMove(row, col, board);
-            }
-        }
+        // Clique no tabuleiro
+        function cliqueTabuleiro(linha, coluna) {
+            const salaRef = database.ref('salas/' + salaAtual);
+            salaRef.once('value').then((snapshot) => {
+                const sala = snapshot.val();
+                if (!sala) return;
 
-        // Lidar com movimento online
-        function handleOnlineMove(row, col, board) {
-            const gameRef = database.ref('games/' + currentGame);
-            gameRef.once('value').then((snapshot) => {
-                const game = snapshot.val();
-                if (!game) return;
-                
-                // Verificar se é a vez do jogador
-                const playerColor = game.players.player1.id === currentPlayer.id ? 'red' : 'black';
-                if (game.currentTurn !== playerColor) return;
-                
-                const piece = board[row][col];
-                
-                if (!selectedPiece && piece && piece.color === playerColor) {
-                    // Selecionar peça
-                    selectedPiece = { row, col };
-                    calculateValidMoves(row, col, board);
-                    renderBoard(board);
-                } else if (selectedPiece) {
-                    // Tentar mover peça
-                    if (isValidMove(selectedPiece, { row, col }, board)) {
-                        const newBoard = makeMove(selectedPiece, { row, col }, board);
+                // Verificar se é minha vez
+                if (sala.vez !== minhaCor) return;
+
+                const tabuleiro = sala.tabuleiro;
+                const peca = tabuleiro[linha][coluna];
+
+                // Selecionar peça
+                if (!pecaSelecionada && peca && peca.cor === minhaCor) {
+                    pecaSelecionada = { linha, coluna };
+                    calcularMovimentos(linha, coluna, tabuleiro);
+                    renderizarTabuleiro(tabuleiro);
+                }
+                // Mover peça
+                else if (pecaSelecionada) {
+                    if (movimentoValido(pecaSelecionada, { linha, coluna })) {
+                        let novoTabuleiro = JSON.parse(JSON.stringify(tabuleiro));
                         
-                        // Verificar se há captura
-                        const captured = Math.abs(row - selectedPiece.row) === 2;
-                        if (captured) {
-                            const capturedRow = (selectedPiece.row + row) / 2;
-                            const capturedCol = (selectedPiece.col + col) / 2;
-                            newBoard[capturedRow][capturedCol] = null;
+                        // Mover peça
+                        novoTabuleiro[linha][coluna] = novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna];
+                        novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna] = null;
+
+                        // Verificar captura
+                        if (Math.abs(linha - pecaSelecionada.linha) === 2) {
+                            let capturaLinha = (pecaSelecionada.linha + linha) / 2;
+                            let capturaColuna = (pecaSelecionada.coluna + coluna) / 2;
+                            novoTabuleiro[capturaLinha][capturaColuna] = null;
                         }
-                        
-                        // Verificar se virou dama
-                        if ((playerColor === 'red' && row === 7) || (playerColor === 'black' && row === 0)) {
-                            newBoard[row][col].king = true;
+
+                        // Verificar dama
+                        if ((minhaCor === 'red' && linha === 7) || (minhaCor === 'black' && linha === 0)) {
+                            novoTabuleiro[linha][coluna].dama = true;
                         }
-                        
-                        // Alternar turno
-                        gameRef.update({
-                            board: newBoard,
-                            currentTurn: playerColor === 'red' ? 'black' : 'red'
+
+                        // Atualizar no Firebase
+                        salaRef.update({
+                            tabuleiro: novoTabuleiro,
+                            vez: minhaCor === 'red' ? 'black' : 'red'
                         });
-                        
-                        selectedPiece = null;
-                        validMoves = [];
+
+                        pecaSelecionada = null;
+                        movimentosValidos = [];
                     } else {
-                        selectedPiece = null;
-                        validMoves = [];
+                        pecaSelecionada = null;
+                        movimentosValidos = [];
                     }
-                    renderBoard(newBoard || board);
+                    renderizarTabuleiro(tabuleiro);
                 }
             });
         }
 
         // Calcular movimentos válidos
-        function calculateValidMoves(row, col, board) {
-            validMoves = [];
-            const piece = board[row][col];
-            if (!piece) return;
-            
-            const directions = piece.color === 'red' ? [[1, -1], [1, 1]] : [[-1, -1], [-1, 1]];
-            if (piece.king) {
-                directions.push([-1, -1], [-1, 1], [1, -1], [1, 1]);
+        function calcularMovimentos(linha, coluna, tabuleiro) {
+            movimentosValidos = [];
+            const peca = tabuleiro[linha][coluna];
+            if (!peca) return;
+
+            const direcoes = peca.cor === 'red' ? [[1, -1], [1, 1]] : [[-1, -1], [-1, 1]];
+            if (peca.dama) {
+                direcoes.push([-1, -1], [-1, 1], [1, -1], [1, 1]);
             }
-            
-            // Verificar movimentos simples e capturas
-            directions.forEach(([dRow, dCol]) => {
-                const newRow = row + dRow;
-                const newCol = col + dCol;
-                
-                if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                    if (!board[newRow][newCol]) {
-                        validMoves.push({ row: newRow, col: newCol });
-                    } else if (board[newRow][newCol].color !== piece.color) {
-                        // Verificar captura
-                        const jumpRow = newRow + dRow;
-                        const jumpCol = newCol + dCol;
-                        if (jumpRow >= 0 && jumpRow < 8 && jumpCol >= 0 && jumpCol < 8 && !board[jumpRow][jumpCol]) {
-                            validMoves.push({ row: jumpRow, col: jumpCol });
-                        }
+
+            direcoes.forEach(([dLinha, dColuna]) => {
+                let novaLinha = linha + dLinha;
+                let novaColuna = coluna + dColuna;
+
+                if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
+                    if (!tabuleiro[novaLinha][novaColuna]) {
+                        movimentosValidos.push({ linha: novaLinha, coluna: novaColuna });
                     }
                 }
             });
         }
 
         // Verificar se movimento é válido
-        function isValidMove(from, to, board) {
-            return validMoves.some(move => move.row === to.row && move.col === to.col);
+        function movimentoValido(de, para) {
+            return movimentosValidos.some(m => m.linha === para.linha && m.coluna === para.coluna);
         }
-
-        // Realizar movimento
-        function makeMove(from, to, board) {
-            const newBoard = JSON.parse(JSON.stringify(board));
-            newBoard[to.row][to.col] = { ...newBoard[from.row][from.col] };
-            newBoard[from.row][from.col] = null;
-            return newBoard;
-        }
-
-        // Selecionar valor da aposta
-        function selectBet(amount) {
-            betAmount = amount;
-            document.querySelectorAll('.bet-option').forEach(opt => opt.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-
-        // Selecionar formato
-        function selectFormat(format) {
-            gameFormat = format;
-            document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-
-        // Confirmar aposta
-        function confirmBet() {
-            if (betAmount === 0) {
-                alert('Selecione um valor para aposta!');
-                return;
-            }
-            
-            if (aiMode) {
-                startAIGame();
-            } else if (currentGame) {
-                const gameRef = database.ref('games/' + currentGame);
-                gameRef.update({
-                    bet: betAmount,
-                    format: gameFormat,
-                    'players/player1/ready': true,
-                    'players/player2/ready': true
-                });
-            }
-        }
-
-        // Iniciar jogo contra IA
-        function startAIGame() {
-            document.getElementById('gameStatus').innerHTML = 'Jogo iniciado! Sua vez (vermelhas)';
-            const board = initializeBoard();
-            renderBoard(board);
-        }
-
-        // Lidar com movimento da IA
-        function handleAIMove(row, col, board) {
-            const piece = board[row][col];
-            
-            if (!selectedPiece && piece && piece.color === 'red') {
-                selectedPiece = { row, col };
-                calculateValidMoves(row, col, board);
-                renderBoard(board);
-            } else if (selectedPiece) {
-                if (isValidMove(selectedPiece, { row, col }, board)) {
-                    const newBoard = makeMove(selectedPiece, { row, col }, board);
-                    
-                    // Verificar captura
-                    if (Math.abs(row - selectedPiece.row) === 2) {
-                        const capturedRow = (selectedPiece.row + row) / 2;
-                        const capturedCol = (selectedPiece.col + col) / 2;
-                        newBoard[capturedRow][capturedCol] = null;
-                    }
-                    
-                    // Verificar se virou dama
-                    if (row === 7) {
-                        newBoard[row][col].king = true;
-                    }
-                    
-                    renderBoard(newBoard);
-                    selectedPiece = null;
-                    validMoves = [];
-                    
-                    // Vez da IA
-                    setTimeout(() => makeAIMove(newBoard), 500);
-                } else {
-                    selectedPiece = null;
-                    validMoves = [];
-                    renderBoard(board);
-                }
-            }
-        }
-
-        // IA fazer movimento
-        function makeAIMove(board) {
-            const aiPieces = [];
-            
-            // Encontrar todas as peças pretas
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    if (board[row][col] && board[row][col].color === 'black') {
-                        aiPieces.push({ row, col, piece: board[row][col] });
-                    }
-                }
-            }
-            
-            if (aiPieces.length === 0) {
-                // IA perdeu
-                showWinner('red');
-                return;
-            }
-            
-            // Escolher movimento aleatório
-            const randomPiece = aiPieces[Math.floor(Math.random() * aiPieces.length)];
-            calculateValidMoves(randomPiece.row, randomPiece.col, board);
-            
-            if (validMoves.length > 0) {
-                const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-                const newBoard = makeMove(randomPiece, randomMove, board);
-                
-                // Verificar captura
-                if (Math.abs(randomMove.row - randomPiece.row) === 2) {
-                    const capturedRow = (randomPiece.row + randomMove.row) / 2;
-                    const capturedCol = (randomPiece.col + randomMove.col) / 2;
-                    newBoard[capturedRow][capturedCol] = null;
-                }
-                
-                // Verificar se virou dama
-                if (randomMove.row === 0) {
-                    newBoard[randomMove.row][randomMove.col].king = true;
-                }
-                
-                renderBoard(newBoard);
-                validMoves = [];
-            } else {
-                // Se não houver movimentos válidos para esta peça, tentar outra
-                makeAIMove(board);
-            }
-        }
-
-        // Mostrar vencedor
-        function showWinner(color) {
-            if (color === 'red') {
-                document.getElementById('gameStatus').innerHTML = '<span class="winner-message">🎉 Você venceu! 🎉</span>';
-                document.getElementById('pixModal').style.display = 'flex';
-            } else {
-                document.getElementById('gameStatus').innerHTML = '<span class="winner-message">😢 A máquina venceu! 😢</span>';
-            }
-        }
-
-        // Enviar chave PIX
-        function submitPix() {
-            const pixKey = document.getElementById('pixKey').value;
-            if (pixKey) {
-                alert('Chave PIX registrada com sucesso! O pagamento será processado em até 24h.');
-                closePixModal();
-            } else {
-                alert('Digite uma chave PIX válida!');
-            }
-        }
-
-        // Fechar modal PIX
-        function closePixModal() {
-            document.getElementById('pixModal').style.display = 'none';
-        }
-
-        // Chat
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message && currentGame) {
-                const gameRef = database.ref('games/' + currentGame + '/chat');
-                gameRef.push({
-                    sender: currentPlayer.name,
-                    message: message,
-                    timestamp: Date.now()
-                });
-                input.value = '';
-            } else if (message && aiMode) {
-                // Chat local para modo IA
-                addMessage('Você', message);
-                setTimeout(() => {
-                    addMessage('Máquina', 'Não posso responder agora, estou jogando! 🤖');
-                }, 1000);
-                input.value = '';
-            }
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function addMessage(sender, message) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageElement = document.createElement('div');
-            messageElement.className = `message ${sender === currentPlayer.name ? 'own-message' : ''}`;
-            messageElement.innerHTML = `
-                <div class="sender">${sender}</div>
-                <div>${message}</div>
-                <div class="time">${new Date().toLocaleTimeString()}</div>
-            `;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Escutar mudanças no jogo
-        function listenToGame(gameCode) {
-            const gameRef = database.ref('games/' + gameCode);
-            gameRef.on('value', (snapshot) => {
-                const game = snapshot.val();
-                if (!game) return;
-                
-                // Atualizar tabuleiro
-                if (game.board) {
-                    renderBoard(game.board);
-                }
-                
-                // Verificar se os dois jogadores estão prontos
-                if (game.players.player1 && game.players.player2 && game.status === 'ready') {
-                    document.getElementById('bettingSection').classList.remove('hidden');
-                }
-                
-                // Atualizar status
-                if (game.status === 'playing') {
-                    document.getElementById('gameStatus').innerHTML = `Vez das peças ${game.currentTurn === 'red' ? 'vermelhas' : 'pretas'}`;
-                }
-                
-                // Atualizar chat
-                if (game.chat) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    chatMessages.innerHTML = '';
-                    Object.values(game.chat).forEach(msg => {
-                        addMessage(msg.sender, msg.message);
-                    });
-                }
-            });
-        }
-
-        // Renderizar tabuleiro inicial
-        renderBoard(initializeBoard());
     </script>
 </body>
 </html>
