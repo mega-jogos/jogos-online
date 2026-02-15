@@ -1,614 +1,1274 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Damas Online</title>
+    <title>🏆 BRASILEIRÃO DE DAMAS - NARRAÇÃO POR JOGO</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, #0a0c0f 0%, #1a1e24 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+            color: #fff;
         }
 
         .container {
-            background: white;
-            border-radius: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(20, 25, 35, 0.95);
+            border-radius: 20px;
             padding: 20px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            border: 1px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .menu {
+        .match-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .round-box {
+            background: #ffd700;
+            color: #0a0c0f;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .match-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .team-home, .team-away {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .team-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .vs {
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .turn-box {
+            background: #2c3e50;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .controls {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
             justify-content: center;
         }
 
-        button {
-            padding: 12px 24px;
+        .btn {
+            padding: 12px 25px;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .btn-criar {
-            background: #28a745;
+        .btn-start {
+            background: #27ae60;
             color: white;
         }
 
-        .btn-criar:hover {
-            background: #218838;
+        .btn-start:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
         }
 
-        .btn-entrar {
-            background: #007bff;
+        .btn-pause {
+            background: #e67e22;
             color: white;
         }
 
-        .btn-entrar:hover {
-            background: #0056b3;
+        .btn-pause:hover {
+            background: #f39c12;
+            transform: translateY(-2px);
         }
 
-        .sala-section {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
+        .btn-speed {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-speed:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
             margin-bottom: 20px;
-            text-align: center;
         }
 
-        .codigo-display {
-            font-size: 48px;
-            font-weight: bold;
-            letter-spacing: 10px;
-            color: #333;
-            background: white;
+        .board-section {
+            background: rgba(20, 25, 35, 0.95);
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border: 2px dashed #007bff;
+            border: 1px solid #3a404b;
         }
 
-        .input-codigo {
-            width: 200px;
-            padding: 10px;
-            font-size: 24px;
-            text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            margin: 10px 0;
+        .board-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
+            width: 100%;
+            max-width: 560px;
             aspect-ratio: 1;
-            background: #deb887;
-            border: 3px solid #8b4513;
-            margin-bottom: 20px;
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
         }
 
-        .square {
+        .cell {
             aspect-ratio: 1;
             display: flex;
-            align-items: center;
             justify-content: center;
-            cursor: pointer;
+            align-items: center;
+            position: relative;
         }
 
-        .square.dark {
-            background: #8b4513;
+        .cell.light {
+            background-color: #ecd9b4;
         }
 
-        .square.light {
-            background: #deb887;
+        .cell.dark {
+            background-color: #b58863;
         }
 
         .piece {
             width: 80%;
             height: 80%;
             border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .piece.red {
-            background: #ff4444;
-            border: 2px solid #cc0000;
-        }
-
-        .piece.black {
-            background: #333;
-            border: 2px solid #000;
-        }
-
-        .piece.king {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em;
+            transition: all 0.3s ease;
             position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .piece.moving {
+            animation: movePiece 0.3s ease;
+        }
+
+        @keyframes movePiece {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .piece.capturing {
+            animation: capture 0.4s ease;
+        }
+
+        @keyframes capture {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
         }
 
         .piece.king::after {
-            content: "♔";
-            color: gold;
-            font-size: 20px;
+            content: "👑";
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .selected {
-            box-shadow: 0 0 0 3px #ffd700;
-        }
-
-        .valid-move {
-            position: relative;
-        }
-
-        .valid-move::after {
-            content: "";
-            width: 30%;
-            height: 30%;
-            background: rgba(255, 255, 255, 0.6);
+            font-size: 0.7em;
+            color: #ffd700;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+            top: -8px;
+            right: -8px;
+            background: rgba(0,0,0,0.3);
             border-radius: 50%;
+            padding: 2px;
+        }
+
+        .coordinates {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            font-size: 10px;
+            color: rgba(0,0,0,0.3);
+            bottom: 2px;
+            right: 2px;
         }
 
-        .status {
+        /* Cores dos times */
+        .piece.flamengo { background: radial-gradient(circle at 30% 30%, #e60012, #8B0000); }
+        .piece.palmeiras { background: radial-gradient(circle at 30% 30%, #006437, #003d21); }
+        .piece.corinthians { background: radial-gradient(circle at 30% 30%, #000000, #1a1a1a); }
+        .piece.sao-paulo { background: radial-gradient(circle at 30% 30%, #e60012, #8B0000); }
+        .piece.santos { background: radial-gradient(circle at 30% 30%, #ffffff, #cccccc); color: #000; }
+        .piece.gremio { background: radial-gradient(circle at 30% 30%, #0a6eb4, #065a94); }
+        .piece.internacional { background: radial-gradient(circle at 30% 30%, #e60012, #8B0000); }
+        .piece.atletico-mg { background: radial-gradient(circle at 30% 30%, #000000, #1a1a1a); }
+        .piece.cruzeiro { background: radial-gradient(circle at 30% 30%, #0038a8, #002a7a); }
+        .piece.botafogo { background: radial-gradient(circle at 30% 30%, #000000, #1a1a1a); }
+        .piece.vasco { background: radial-gradient(circle at 30% 30%, #000000, #1a1a1a); }
+        .piece.bahia { background: radial-gradient(circle at 30% 30%, #0038a8, #002a7a); }
+        .piece.fortaleza { background: radial-gradient(circle at 30% 30%, #e60012, #8B0000); }
+        .piece.athletico-pr { background: radial-gradient(circle at 30% 30%, #e60012, #8B0000); }
+        .piece.bragantino { background: radial-gradient(circle at 30% 30%, #ffffff, #cccccc); color: #000; }
+        .piece.fluminense { background: radial-gradient(circle at 30% 30%, #8B0000, #5a0000); }
+        .piece.cuiaba { background: radial-gradient(circle at 30% 30%, #006437, #003d21); }
+        .piece.goias { background: radial-gradient(circle at 30% 30%, #006437, #003d21); }
+        .piece.coritiba { background: radial-gradient(circle at 30% 30%, #006437, #003d21); }
+        .piece.america-mg { background: radial-gradient(circle at 30% 30%, #006437, #003d21); }
+
+        .narration-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #2c3e50;
+            border-radius: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-style: italic;
+            border-left: 4px solid #ffd700;
+            width: 100%;
+        }
+
+        .narration-text {
+            color: #ecf0f1;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .narration-timestamp {
+            color: #ffd700;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        .table-section {
+            background: rgba(20, 25, 35, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #3a404b;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .table-section h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            font-size: 1.8em;
         }
 
-        .jogadores {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+        }
+
+        th {
+            background: #2c3e50;
+            padding: 12px 5px;
+            position: sticky;
+            top: 0;
+            color: #ffd700;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 10px 5px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        tr:hover {
+            background: #2c3e50;
+        }
+
+        .g4 {
+            background: rgba(46, 204, 113, 0.2);
+        }
+
+        .z4 {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .campeao {
+            background: rgba(255, 215, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .status-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .jogador {
+            margin: 15px 0;
             padding: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            flex: 1;
-            margin: 0 5px;
+            background: #2c3e50;
+            border-radius: 10px;
+            width: 100%;
+        }
+
+        .pieces-count {
+            display: flex;
+            gap: 30px;
+        }
+
+        .result-box {
             text-align: center;
-        }
-
-        .jogador.ativo {
-            background: #28a745;
-            color: white;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .aguardando {
-            color: #ffc107;
+            font-size: 1.2em;
+            padding: 10px;
+            background: #27ae60;
+            border-radius: 10px;
+            margin-top: 10px;
             font-weight: bold;
+            width: 100%;
+        }
+
+        .footer {
+            background: rgba(20, 25, 35, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ffd700;
+        }
+
+        .color-hint {
+            font-size: 0.9em;
+            color: #ffd700;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎮 Jogo de Damas Online 🎮</h1>
-        
-        <div class="menu">
-            <button class="btn-criar" onclick="criarSala()">Criar Sala (Código 4 dígitos)</button>
-            <button class="btn-entrar" onclick="mostrarEntrar()">Entrar na Sala</button>
-        </div>
-
-        <!-- Área da Sala Criada -->
-        <div id="salaCriada" class="sala-section hidden">
-            <h3>✅ Sala Criada!</h3>
-            <p>Compartilhe este código de 4 dígitos com seu amigo:</p>
-            <div class="codigo-display" id="codigoSala"></div>
-            <p class="aguardando" id="aguardandoMsg">⏳ Aguardando oponente entrar...</p>
-        </div>
-
-        <!-- Área para Entrar -->
-        <div id="entrarSala" class="sala-section hidden">
-            <h3>🔑 Digite o código da sala:</h3>
-            <input type="text" class="input-codigo" id="inputCodigo" maxlength="4" placeholder="0000" autocomplete="off">
-            <button class="btn-entrar" onclick="entrarSala()" style="display: block; margin: 10px auto;">Entrar na Sala</button>
-            <button onclick="voltarMenu()" style="margin-top: 10px; background: #6c757d; color: white;">Voltar</button>
-        </div>
-
-        <!-- Área do Jogo -->
-        <div id="jogoArea" class="hidden">
-            <div class="jogadores">
-                <div class="jogador" id="jogador1">🟥 Jogador 1 (Vermelho)</div>
-                <div class="jogador" id="jogador2">⬛ Jogador 2 (Preto)</div>
+        <div class="header">
+            <h1>🏆 BRASILEIRÃO DE DAMAS 2024 - NARRAÇÃO POR JOGO</h1>
+            <div class="match-info">
+                <div class="round-box" id="roundDisplay">RODADA 1/38</div>
+                <div class="match-box" id="matchDisplay">
+                    <div class="team-home" id="homeTeamContainer">
+                        <div class="team-badge" id="homeBadge">🔴</div>
+                        <span id="homeTeam">Flamengo</span>
+                    </div>
+                    <span class="vs">VS</span>
+                    <div class="team-away" id="awayTeamContainer">
+                        <div class="team-badge" id="awayBadge">🟢</div>
+                        <span id="awayTeam">Palmeiras</span>
+                    </div>
+                </div>
+                <div class="turn-box" id="turnIndicator">Vez: 🔴 Flamengo</div>
             </div>
-            
-            <div class="status" id="status">Carregando jogo...</div>
-            
-            <div class="board" id="board"></div>
+            <div class="color-hint" id="colorHint"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-start" onclick="window.campeonato.iniciar()">▶ INICIAR</button>
+            <button class="btn btn-pause" onclick="window.campeonato.pausar()">⏸ PAUSAR</button>
+            <button class="btn btn-speed" onclick="window.campeonato.acelerar()">⚡ NORMAL</button>
+            <button class="btn btn-reset" onclick="window.campeonato.resetar()">🔄 RESETAR</button>
+        </div>
+
+        <div class="main-content">
+            <div class="board-section">
+                <div class="board-container">
+                    <div class="board" id="board"></div>
+                    
+                    <div class="status-bar">
+                        <div class="pieces-count" id="piecesCount">
+                            <span id="homeCount">🔴 12</span>
+                            <span id="awayCount">🟢 12</span>
+                        </div>
+                        <div id="moveCounter">⚫ 0</div>
+                    </div>
+                    
+                    <div class="narration-box" id="narrationBox">
+                        <div class="narration-text" id="narrationText">⚡ Narração iniciará em breve... ⚡</div>
+                    </div>
+                    
+                    <div id="matchResult" class="result-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h2>📊 CLASSIFICAÇÃO</h2>
+                <table id="tabela">
+                    <thead>
+                        <tr>
+                            <th>POS</th>
+                            <th>TIME</th>
+                            <th>PTS</th>
+                            <th>V</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>SG</th>
+                            <th>PC</th>
+                            <th>PS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer" id="footer">
+            <span>⚡ PRONTO PARA INICIAR ⚡</span>
         </div>
     </div>
 
     <script>
-        // SIMULAÇÃO DE BANCO DE DADOS LOCAL
-        // Isso substitui o Firebase que estava com problemas
-        
-        let salas = {}; // Objeto para armazenar as salas em memória
-        
-        // Gerar ID único para cada jogador
-        let meuId = 'jogador_' + Math.random().toString(36).substr(2, 9);
-        let salaAtual = null;
-        let minhaCor = null;
-        let pecaSelecionada = null;
-        let movimentosValidos = [];
-        
-        // Intervalo para verificar atualizações
-        let intervaloAtualizacao = null;
+        // Times do Campeonato com cores e símbolos
+        const TIMES = [
+            { nome: 'Flamengo', cor: '#e60012', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Palmeiras', cor: '#006437', simbolo: '🟢', emoji: '🟢', grupo: 'verde' },
+            { nome: 'Corinthians', cor: '#000000', simbolo: '⚫', emoji: '⚫', grupo: 'preto' },
+            { nome: 'São Paulo', cor: '#e60012', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Santos', cor: '#ffffff', simbolo: '⚪', emoji: '⚪', grupo: 'branco' },
+            { nome: 'Grêmio', cor: '#0a6eb4', simbolo: '🔵', emoji: '🔵', grupo: 'azul' },
+            { nome: 'Internacional', cor: '#e60012', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Atlético-MG', cor: '#000000', simbolo: '⚫', emoji: '⚫', grupo: 'preto' },
+            { nome: 'Cruzeiro', cor: '#0038a8', simbolo: '🔵', emoji: '🔵', grupo: 'azul' },
+            { nome: 'Botafogo', cor: '#000000', simbolo: '⚫', emoji: '⚫', grupo: 'preto' },
+            { nome: 'Vasco', cor: '#000000', simbolo: '⚫', emoji: '⚫', grupo: 'preto' },
+            { nome: 'Bahia', cor: '#0038a8', simbolo: '🔵', emoji: '🔵', grupo: 'azul' },
+            { nome: 'Fortaleza', cor: '#e60012', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Athletico-PR', cor: '#e60012', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Bragantino', cor: '#ffffff', simbolo: '⚪', emoji: '⚪', grupo: 'branco' },
+            { nome: 'Fluminense', cor: '#8B0000', simbolo: '🔴', emoji: '🔴', grupo: 'vermelho' },
+            { nome: 'Cuiabá', cor: '#006437', simbolo: '🟢', emoji: '🟢', grupo: 'verde' },
+            { nome: 'Goiás', cor: '#006437', simbolo: '🟢', emoji: '🟢', grupo: 'verde' },
+            { nome: 'Coritiba', cor: '#006437', simbolo: '🟢', emoji: '🟢', grupo: 'verde' },
+            { nome: 'América-MG', cor: '#006437', simbolo: '🟢', emoji: '🟢', grupo: 'verde' }
+        ];
 
-        // Função para criar sala com código de 4 dígitos
-        function criarSala() {
-            // Gerar código aleatório de 4 dígitos
-            let codigo = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // Criar tabuleiro inicial
-            let tabuleiroInicial = criarTabuleiro();
-            
-            // Criar objeto da sala
-            salas[codigo] = {
-                criador: meuId,
-                jogadores: {
-                    jogador1: {
-                        id: meuId,
-                        nome: 'Jogador 1',
-                        cor: 'red'
-                    }
-                },
-                status: 'aguardando',
-                tabuleiro: tabuleiroInicial,
-                vez: 'red'
-            };
-            
-            // Mostrar código da sala
-            salaAtual = codigo;
-            minhaCor = 'red';
-            
-            document.getElementById('codigoSala').textContent = codigo;
-            document.getElementById('salaCriada').classList.remove('hidden');
-            document.getElementById('entrarSala').classList.add('hidden');
-            
-            // Começar a verificar se alguém entrou na sala
-            verificarSala(codigo);
-            
-            alert('Sala criada com sucesso! Código: ' + codigo);
-        }
-
-        // Mostrar campo para entrar na sala
-        function mostrarEntrar() {
-            document.getElementById('entrarSala').classList.remove('hidden');
-            document.getElementById('salaCriada').classList.add('hidden');
-            document.getElementById('inputCodigo').value = '';
-        }
-
-        // Voltar ao menu
-        function voltarMenu() {
-            document.getElementById('entrarSala').classList.add('hidden');
-        }
-
-        // Função para entrar na sala
-        function entrarSala() {
-            let codigo = document.getElementById('inputCodigo').value.trim();
-            
-            if (codigo.length !== 4) {
-                alert('Digite um código válido de 4 dígitos!');
-                return;
+        // Classe Time
+        class Time {
+            constructor(timeData) {
+                this.nome = timeData.nome;
+                this.cor = timeData.cor;
+                this.simbolo = timeData.simbolo;
+                this.emoji = timeData.emoji;
+                this.grupo = timeData.grupo;
+                this.pontos = 0;
+                this.vitorias = 0;
+                this.empates = 0;
+                this.derrotas = 0;
+                this.pecasCapturadas = 0;
+                this.pecasSofridas = 0;
+                this.id = timeData.nome.toLowerCase().replace(' ', '-').replace('á', 'a').replace('ã', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ç', 'c').replace('-pr', '-pr');
+                this.corUsada = this.cor;
+                this.usarVariacao = false;
             }
 
-            // Verificar se a sala existe no objeto local
-            if (salas[codigo]) {
-                const sala = salas[codigo];
+            get saldo() {
+                return this.pecasCapturadas - this.pecasSofridas;
+            }
+        }
+
+        // Classe PartidaDamas
+        class PartidaDamas {
+            constructor(time1, time2, onUpdate, onNarracao, rodada, jogo) {
+                this.time1 = time1;
+                this.time2 = time2;
+                this.onUpdate = onUpdate;
+                this.onNarracao = onNarracao;
+                this.rodada = rodada;
+                this.jogo = jogo;
                 
-                // Verificar se a sala está disponível
-                if (sala.status === 'aguardando' && !sala.jogadores.jogador2) {
-                    // Adicionar jogador 2
-                    sala.jogadores.jogador2 = {
-                        id: meuId,
-                        nome: 'Jogador 2',
-                        cor: 'black'
-                    };
-                    sala.status = 'jogando';
-                    
-                    salaAtual = codigo;
-                    minhaCor = 'black';
-                    
-                    // Esconder telas de criação/entrada
-                    document.getElementById('salaCriada').classList.add('hidden');
-                    document.getElementById('entrarSala').classList.add('hidden');
-                    
-                    // Mostrar jogo
-                    mostrarJogo(sala);
-                    
-                    alert('Você entrou na sala ' + codigo + '!');
+                // Verificar se os times têm a mesma cor principal
+                if (this.time1.grupo === this.time2.grupo) {
+                    this.time1.usarVariacao = false;
+                    this.time2.usarVariacao = true;
+                    this.time1.corUsada = this.time1.cor;
+                    this.time2.corUsada = this.getVariacaoCor(this.time2);
                 } else {
-                    alert('Sala indisponível! Ela já pode estar cheia.');
+                    this.time1.usarVariacao = false;
+                    this.time2.usarVariacao = false;
+                    this.time1.corUsada = this.time1.cor;
+                    this.time2.corUsada = this.time2.cor;
                 }
-            } else {
-                alert('Sala não encontrada! Verifique o código.');
+                
+                this.tabuleiro = this.inicializarTabuleiro();
+                this.vez = 'home';
+                this.vencedor = null;
+                this.empate = false;
+                this.moveCount = 0;
+                this.emAndamento = true;
+                this.narracao = [];
+                
+                // Registrar início da partida
+                this.adicionarNarracao(`🏁 INÍCIO DA PARTIDA: ${time1.nome} ${time1.simbolo} vs ${time2.nome} ${time2.simbolo}`);
+                this.adicionarNarracao(`📊 Posição inicial: 12 peças para cada lado`);
             }
-        }
 
-        // Função para verificar se alguém entrou na sala (para quem criou)
-        function verificarSala(codigo) {
-            if (intervaloAtualizacao) {
-                clearInterval(intervaloAtualizacao);
+            getVariacaoCor(time) {
+                const variacoes = {
+                    'vermelho': ['#ff4444', '#ff6666', '#ff2222', '#ff5555', '#ff3333', '#aa4444'],
+                    'verde': ['#00aa55', '#22cc77', '#44ee99', '#11bb66', '#33dd88'],
+                    'preto': ['#333333', '#444444', '#555555', '#666666'],
+                    'azul': ['#2288dd', '#1155cc', '#3377ee'],
+                    'branco': ['#eeeeee', '#dddddd']
+                };
+                
+                const grupoVariacoes = variacoes[time.grupo] || ['#cccccc'];
+                return grupoVariacoes[Math.floor(Math.random() * grupoVariacoes.length)];
             }
-            
-            intervaloAtualizacao = setInterval(() => {
-                if (salas[codigo] && salas[codigo].status === 'jogando') {
-                    // Alguém entrou na sala!
-                    clearInterval(intervaloAtualizacao);
-                    mostrarJogo(salas[codigo]);
-                }
-            }, 1000);
-        }
 
-        // Função para mostrar o jogo
-        function mostrarJogo(sala) {
-            document.getElementById('jogoArea').classList.remove('hidden');
-            document.getElementById('salaCriada').classList.add('hidden');
-            
-            // Atualizar informações dos jogadores
-            document.getElementById('jogador1').innerHTML = '🟥 Jogador 1 (Vermelho)';
-            document.getElementById('jogador2').innerHTML = '⬛ Jogador 2 (Preto)';
-            
-            // Atualizar status
-            document.getElementById('status').innerHTML = 'Vez das peças: 🟥 VERMELHAS';
-            
-            // Destacar jogador atual
-            document.getElementById('jogador1').classList.add('ativo');
-            document.getElementById('jogador2').classList.remove('ativo');
-            
-            // Renderizar tabuleiro
-            renderizarTabuleiro(sala.tabuleiro);
-        }
-
-        // Função para criar tabuleiro inicial
-        function criarTabuleiro() {
-            let tabuleiro = [];
-            
-            // Inicializar tabuleiro vazio
-            for (let i = 0; i < 8; i++) {
-                tabuleiro[i] = [];
-                for (let j = 0; j < 8; j++) {
-                    tabuleiro[i][j] = null;
+            adicionarNarracao(texto) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.narracao.push({ timestamp, texto });
+                if (this.onNarracao) {
+                    this.onNarracao(texto);
                 }
             }
 
-            // Posicionar peças vermelhas (parte de cima)
-            for (let linha = 0; linha < 3; linha++) {
-                for (let coluna = 0; coluna < 8; coluna++) {
-                    if ((linha + coluna) % 2 === 1) {
-                        tabuleiro[linha][coluna] = { cor: 'red', dama: false };
+            inicializarTabuleiro() {
+                const tabuleiro = Array(8).fill().map(() => Array(8).fill(null));
+                
+                for (let linha = 0; linha < 3; linha++) {
+                    for (let coluna = 0; coluna < 8; coluna++) {
+                        if ((linha + coluna) % 2 === 1) {
+                            tabuleiro[linha][coluna] = { 
+                                time: 'home', 
+                                timeObj: this.time1,
+                                usarVariacao: this.time1.usarVariacao,
+                                dama: false,
+                                linha,
+                                coluna 
+                            };
+                        }
                     }
                 }
-            }
-
-            // Posicionar peças pretas (parte de baixo)
-            for (let linha = 5; linha < 8; linha++) {
-                for (let coluna = 0; coluna < 8; coluna++) {
-                    if ((linha + coluna) % 2 === 1) {
-                        tabuleiro[linha][coluna] = { cor: 'black', dama: false };
+                
+                for (let linha = 5; linha < 8; linha++) {
+                    for (let coluna = 0; coluna < 8; coluna++) {
+                        if ((linha + coluna) % 2 === 1) {
+                            tabuleiro[linha][coluna] = { 
+                                time: 'away', 
+                                timeObj: this.time2,
+                                usarVariacao: this.time2.usarVariacao,
+                                dama: false,
+                                linha,
+                                coluna 
+                            };
+                        }
                     }
                 }
+                
+                return tabuleiro;
             }
 
-            return tabuleiro;
-        }
-
-        // Função para renderizar tabuleiro
-        function renderizarTabuleiro(tabuleiro) {
-            const boardElement = document.getElementById('board');
-            boardElement.innerHTML = '';
-
-            for (let linha = 0; linha < 8; linha++) {
-                for (let coluna = 0; coluna < 8; coluna++) {
-                    const square = document.createElement('div');
-                    square.className = `square ${(linha + coluna) % 2 === 0 ? 'light' : 'dark'}`;
-                    square.dataset.linha = linha;
-                    square.dataset.coluna = coluna;
-
-                    const peca = tabuleiro[linha][coluna];
-                    if (peca) {
-                        const pecaElement = document.createElement('div');
-                        pecaElement.className = `piece ${peca.cor} ${peca.dama ? 'king' : ''}`;
-                        square.appendChild(pecaElement);
+            contarPecas(time) {
+                let count = 0;
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        if (this.tabuleiro[i][j] && this.tabuleiro[i][j].time === time) {
+                            count++;
+                        }
                     }
-
-                    // Destacar peça selecionada
-                    if (pecaSelecionada && pecaSelecionada.linha === linha && pecaSelecionada.coluna === coluna) {
-                        square.classList.add('selected');
-                    }
-
-                    // Destacar movimentos válidos
-                    if (movimentosValidos.some(m => m.linha === linha && m.coluna === coluna)) {
-                        square.classList.add('valid-move');
-                    }
-
-                    square.onclick = () => cliqueTabuleiro(linha, coluna);
-                    boardElement.appendChild(square);
                 }
-            }
-        }
-
-        // Função para clique no tabuleiro
-        function cliqueTabuleiro(linha, coluna) {
-            if (!salaAtual) return;
-            
-            const sala = salas[salaAtual];
-            if (!sala) return;
-
-            // Verificar se é minha vez
-            if (sala.vez !== minhaCor) {
-                alert('Agora não é sua vez!');
-                return;
+                return count;
             }
 
-            // Verificar se os dois jogadores estão na sala
-            if (!sala.jogadores.jogador2) {
-                alert('Aguardando segundo jogador...');
-                return;
-            }
+            obterMovimentosValidos(linha, coluna) {
+                const peca = this.tabuleiro[linha][coluna];
+                if (!peca) return [];
 
-            const tabuleiro = sala.tabuleiro;
-            const peca = tabuleiro[linha][coluna];
+                const movimentos = [];
+                const direcoes = peca.dama ? 
+                    [[-1,-1], [-1,1], [1,-1], [1,1]] : 
+                    (peca.time === 'home' ? [[1,-1], [1,1]] : [[-1,-1], [-1,1]]);
 
-            // Se não tem peça selecionada, tenta selecionar uma peça
-            if (!pecaSelecionada) {
-                if (peca && peca.cor === minhaCor) {
-                    pecaSelecionada = { linha, coluna };
-                    calcularMovimentosValidos(linha, coluna, tabuleiro);
-                    renderizarTabuleiro(tabuleiro);
+                for (const [dl, dc] of direcoes) {
+                    const linhaMeio = linha + dl;
+                    const colunaMeio = coluna + dc;
+                    const linhaDestino = linha + (dl * 2);
+                    const colunaDestino = coluna + (dc * 2);
+
+                    if (this.dentroTabuleiro(linhaMeio, colunaMeio) && this.dentroTabuleiro(linhaDestino, colunaDestino)) {
+                        const pecaMeio = this.tabuleiro[linhaMeio][colunaMeio];
+                        const pecaDestino = this.tabuleiro[linhaDestino][colunaDestino];
+
+                        if (pecaMeio && pecaMeio.time !== peca.time && !pecaDestino) {
+                            movimentos.push({
+                                destino: [linhaDestino, colunaDestino],
+                                captura: [linhaMeio, colunaMeio],
+                                tipo: 'captura'
+                            });
+                        }
+                    }
                 }
-            } 
-            // Se tem peça selecionada, tenta mover
-            else {
-                if (movimentoValido(pecaSelecionada, { linha, coluna })) {
-                    // Fazer o movimento
-                    let novoTabuleiro = JSON.parse(JSON.stringify(tabuleiro));
-                    
-                    // Mover a peça
-                    novoTabuleiro[linha][coluna] = novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna];
-                    novoTabuleiro[pecaSelecionada.linha][pecaSelecionada.coluna] = null;
 
-                    // Verificar se houve captura
-                    if (Math.abs(linha - pecaSelecionada.linha) === 2) {
-                        let linhaCaptura = (pecaSelecionada.linha + linha) / 2;
-                        let colunaCaptura = (pecaSelecionada.coluna + coluna) / 2;
-                        novoTabuleiro[linhaCaptura][colunaCaptura] = null;
+                if (movimentos.length === 0) {
+                    for (const [dl, dc] of direcoes) {
+                        if (peca.dama) {
+                            let mult = 1;
+                            while (true) {
+                                const novaLinha = linha + (dl * mult);
+                                const novaColuna = coluna + (dc * mult);
+                                
+                                if (!this.dentroTabuleiro(novaLinha, novaColuna)) break;
+                                if (this.tabuleiro[novaLinha][novaColuna]) break;
+                                
+                                movimentos.push({
+                                    destino: [novaLinha, novaColuna],
+                                    captura: null,
+                                    tipo: 'movimento'
+                                });
+                                mult++;
+                            }
+                        } else {
+                            const novaLinha = linha + dl;
+                            const novaColuna = coluna + dc;
+                            
+                            if (this.dentroTabuleiro(novaLinha, novaColuna) && !this.tabuleiro[novaLinha][novaColuna]) {
+                                movimentos.push({
+                                    destino: [novaLinha, novaColuna],
+                                    captura: null,
+                                    tipo: 'movimento'
+                                });
+                            }
+                        }
                     }
+                }
 
-                    // Verificar se virou dama
-                    if (minhaCor === 'red' && linha === 7) {
-                        novoTabuleiro[linha][coluna].dama = true;
-                    }
-                    if (minhaCor === 'black' && linha === 0) {
-                        novoTabuleiro[linha][coluna].dama = true;
-                    }
+                return movimentos;
+            }
 
-                    // Atualizar tabuleiro na sala
-                    sala.tabuleiro = novoTabuleiro;
-                    sala.vez = minhaCor === 'red' ? 'black' : 'red';
+            dentroTabuleiro(linha, coluna) {
+                return linha >= 0 && linha < 8 && coluna >= 0 && coluna < 8;
+            }
 
-                    // Atualizar interface
-                    atualizarInterface(sala);
-
-                    pecaSelecionada = null;
-                    movimentosValidos = [];
+            async moverPeca(origem, destino, captura) {
+                const [l1, c1] = origem;
+                const [l2, c2] = destino;
+                const peca = this.tabuleiro[l1][c1];
+                
+                const coordOrigem = `${String.fromCharCode(65 + c1)}${8 - l1}`;
+                const coordDestino = `${String.fromCharCode(65 + c2)}${8 - l2}`;
+                const timeAtual = peca.time === 'home' ? this.time1 : this.time2;
+                
+                if (captura) {
+                    const [cl, cc] = captura;
+                    const timeCapturado = this.tabuleiro[cl][cc].time === 'home' ? this.time1 : this.time2;
+                    this.adicionarNarracao(`⚔️ CAPTURA! Peça de ${timeAtual.nome} ${timeAtual.simbolo} captura peça de ${timeCapturado.nome} ${timeCapturado.simbolo} em ${coordOrigem} → ${coordDestino}`);
                 } else {
-                    // Se clicou em lugar inválido, desseleciona
-                    pecaSelecionada = null;
-                    movimentosValidos = [];
+                    this.adicionarNarracao(`🏃 Movimento: ${timeAtual.nome} ${timeAtual.simbolo} move peça de ${coordOrigem} para ${coordDestino}`);
                 }
-                renderizarTabuleiro(tabuleiro);
-            }
-        }
-
-        // Função para atualizar interface
-        function atualizarInterface(sala) {
-            // Atualizar status
-            let vezTexto = sala.vez === 'red' ? '🟥 VERMELHAS' : '⬛ PRETAS';
-            document.getElementById('status').innerHTML = `Vez das peças: ${vezTexto}`;
-            
-            // Destacar jogador atual
-            if (sala.vez === 'red') {
-                document.getElementById('jogador1').classList.add('ativo');
-                document.getElementById('jogador2').classList.remove('ativo');
-            } else {
-                document.getElementById('jogador2').classList.add('ativo');
-                document.getElementById('jogador1').classList.remove('ativo');
-            }
-            
-            // Renderizar tabuleiro
-            renderizarTabuleiro(sala.tabuleiro);
-        }
-
-        // Função para calcular movimentos válidos
-        function calcularMovimentosValidos(linha, coluna, tabuleiro) {
-            movimentosValidos = [];
-            const peca = tabuleiro[linha][coluna];
-            if (!peca) return;
-
-            // Direções básicas
-            let direcoes = [];
-            if (peca.cor === 'red') {
-                direcoes = [[1, -1], [1, 1]];
-            } else {
-                direcoes = [[-1, -1], [-1, 1]];
-            }
-
-            // Se for dama, pode andar em todas as direções
-            if (peca.dama) {
-                direcoes = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-            }
-
-            // Verificar cada direção
-            direcoes.forEach(([dLinha, dColuna]) => {
-                let novaLinha = linha + dLinha;
-                let novaColuna = coluna + dColuna;
-
-                // Movimento simples
-                if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
-                    if (!tabuleiro[novaLinha][novaColuna]) {
-                        movimentosValidos.push({ linha: novaLinha, coluna: novaColuna });
-                    }
-                }
-
-                // Captura
-                let linhaPulo = linha + (dLinha * 2);
-                let colunaPulo = coluna + (dColuna * 2);
-                let linhaMeio = linha + dLinha;
-                let colunaMeio = coluna + dColuna;
-
-                if (linhaPulo >= 0 && linhaPulo < 8 && colunaPulo >= 0 && colunaPulo < 8) {
-                    let pecaMeio = tabuleiro[linhaMeio][colunaMeio];
-                    let pecaDestino = tabuleiro[linhaPulo][colunaPulo];
+                
+                await this.animarMovimento(l1, c1, l2, c2);
+                
+                this.tabuleiro[l2][c2] = { ...peca, linha: l2, coluna: c2 };
+                this.tabuleiro[l1][c1] = null;
+                
+                if (captura) {
+                    const [cl, cc] = captura;
+                    await this.animarCaptura(cl, cc);
+                    const pecaCapturada = this.tabuleiro[cl][cc];
                     
-                    if (pecaMeio && pecaMeio.cor !== peca.cor && !pecaDestino) {
-                        movimentosValidos.push({ linha: linhaPulo, coluna: colunaPulo });
+                    if (pecaCapturada) {
+                        if (pecaCapturada.time === 'home') {
+                            this.time1.pecasSofridas++;
+                            this.time2.pecasCapturadas++;
+                        } else {
+                            this.time2.pecasSofridas++;
+                            this.time1.pecasCapturadas++;
+                        }
+                    }
+                    
+                    this.tabuleiro[cl][cc] = null;
+                }
+                
+                if (peca.time === 'home' && l2 === 7 && !peca.dama) {
+                    this.tabuleiro[l2][c2].dama = true;
+                    this.adicionarNarracao(`👑 QUE ISSO! Peça de ${timeAtual.nome} ${timeAtual.simbolo} virou DAMA!`);
+                } else if (peca.time === 'away' && l2 === 0 && !peca.dama) {
+                    this.tabuleiro[l2][c2].dama = true;
+                    this.adicionarNarracao(`👑 QUE ISSO! Peça de ${timeAtual.nome} ${timeAtual.simbolo} virou DAMA!`);
+                }
+                
+                this.moveCount++;
+                this.verificarFimDeJogo();
+            }
+
+            async animarMovimento(l1, c1, l2, c2) {
+                const cells = document.querySelectorAll('.cell');
+                const index1 = l1 * 8 + c1;
+                
+                if (cells[index1] && cells[index1].firstChild) {
+                    cells[index1].firstChild.classList.add('moving');
+                    await this.delay(150);
+                    cells[index1].firstChild.classList.remove('moving');
+                }
+                
+                this.onUpdate();
+                await this.delay(100);
+            }
+
+            async animarCaptura(l, c) {
+                const cells = document.querySelectorAll('.cell');
+                const index = l * 8 + c;
+                
+                if (cells[index] && cells[index].firstChild) {
+                    cells[index].firstChild.classList.add('capturing');
+                    await this.delay(300);
+                }
+            }
+
+            verificarFimDeJogo() {
+                const pecasHome = this.contarPecas('home');
+                const pecasAway = this.contarPecas('away');
+                
+                // Verificar empate por 1 peça cada
+                if (pecasHome === 1 && pecasAway === 1) {
+                    this.adicionarNarracao(`🤝 EMPATE! Ambos os times ficaram com apenas 1 peça cada!`);
+                    this.empate = true;
+                    this.emAndamento = false;
+                    return;
+                }
+                
+                if (pecasHome === 0) {
+                    this.adicionarNarracao(`🏆 VITÓRIA DE ${this.time2.nome} ${this.time2.simbolo}! ${this.time1.nome} ficou sem peças!`);
+                    this.vencedor = 'away';
+                    this.emAndamento = false;
+                } else if (pecasAway === 0) {
+                    this.adicionarNarracao(`🏆 VITÓRIA DE ${this.time1.nome} ${this.time1.simbolo}! ${this.time2.nome} ficou sem peças!`);
+                    this.vencedor = 'home';
+                    this.emAndamento = false;
+                } else {
+                    const homeTemMovimento = this.temMovimentos('home');
+                    const awayTemMovimento = this.temMovimentos('away');
+                    
+                    if (!homeTemMovimento && !awayTemMovimento) {
+                        this.adicionarNarracao(`🤝 EMPATE! Nenhum dos times tem movimentos disponíveis.`);
+                        this.empate = true;
+                        this.emAndamento = false;
+                    } else if (!homeTemMovimento) {
+                        this.adicionarNarracao(`🏆 VITÓRIA DE ${this.time2.nome} ${this.time2.simbolo}! ${this.time1.nome} não tem movimentos!`);
+                        this.vencedor = 'away';
+                        this.emAndamento = false;
+                    } else if (!awayTemMovimento) {
+                        this.adicionarNarracao(`🏆 VITÓRIA DE ${this.time1.nome} ${this.time1.simbolo}! ${this.time2.nome} não tem movimentos!`);
+                        this.vencedor = 'home';
+                        this.emAndamento = false;
                     }
                 }
-            });
+            }
+
+            temMovimentos(time) {
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        const peca = this.tabuleiro[i][j];
+                        if (peca && peca.time === time) {
+                            const movimentos = this.obterMovimentosValidos(i, j);
+                            if (movimentos.length > 0) return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            async jogadaAutomatica() {
+                if (!this.emAndamento) return false;
+                
+                const pecas = [];
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        if (this.tabuleiro[i][j] && this.tabuleiro[i][j].time === this.vez) {
+                            pecas.push([i, j]);
+                        }
+                    }
+                }
+                
+                pecas.sort(() => Math.random() - 0.5);
+                
+                for (const [l, c] of pecas) {
+                    const movimentos = this.obterMovimentosValidos(l, c);
+                    const capturas = movimentos.filter(m => m.tipo === 'captura');
+                    
+                    if (capturas.length > 0) {
+                        const movimento = capturas[Math.floor(Math.random() * capturas.length)];
+                        await this.moverPeca([l, c], movimento.destino, movimento.captura);
+                        
+                        const [novaL, novaC] = movimento.destino;
+                        const novosMovimentos = this.obterMovimentosValidos(novaL, novaC);
+                        const novasCapturas = novosMovimentos.filter(m => m.tipo === 'captura');
+                        
+                        if (novasCapturas.length > 0) {
+                            return true;
+                        }
+                        
+                        this.vez = this.vez === 'home' ? 'away' : 'home';
+                        return true;
+                    }
+                }
+                
+                for (const [l, c] of pecas) {
+                    const movimentos = this.obterMovimentosValidos(l, c);
+                    if (movimentos.length > 0) {
+                        const movimento = movimentos[Math.floor(Math.random() * movimentos.length)];
+                        await this.moverPeca([l, c], movimento.destino, movimento.captura);
+                        this.vez = this.vez === 'home' ? 'away' : 'home';
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            // Gerar arquivo de narração para este jogo
+            gerarArquivoNarracao() {
+                let conteudo = '='.repeat(60) + '\n';
+                conteudo += `🏆 CAMPEONATO BRASILEIRO DE DAMAS 2024\n`;
+                conteudo += '='.repeat(60) + '\n\n';
+                conteudo += `📌 RODADA ${this.rodada} - ${this.jogo}\n`;
+                conteudo += `${this.time1.nome} ${this.time1.simbolo} vs ${this.time2.nome} ${this.time2.simbolo}\n`;
+                conteudo += '-'.repeat(40) + '\n\n';
+                
+                this.narracao.forEach(item => {
+                    conteudo += `[${item.timestamp}] ${item.texto}\n`;
+                });
+                
+                conteudo += '\n' + '='.repeat(40) + '\n';
+                conteudo += `📊 RESULTADO FINAL: `;
+                
+                if (this.vencedor === 'home') {
+                    conteudo += `Vitória do ${this.time1.nome} ${this.time1.simbolo}\n`;
+                } else if (this.vencedor === 'away') {
+                    conteudo += `Vitória do ${this.time2.nome} ${this.time2.simbolo}\n`;
+                } else {
+                    conteudo += `Empate\n`;
+                }
+                
+                conteudo += `📈 Estatísticas:\n`;
+                conteudo += `   ${this.time1.nome}: ${this.contarPecas('home')} peças restantes\n`;
+                conteudo += `   ${this.time2.nome}: ${this.contarPecas('away')} peças restantes\n`;
+                conteudo += `   Total de movimentos: ${this.moveCount}\n`;
+                conteudo += '='.repeat(60) + '\n';
+                
+                return conteudo;
+            }
         }
 
-        // Função para verificar se movimento é válido
-        function movimentoValido(de, para) {
-            return movimentosValidos.some(m => m.linha === para.linha && m.coluna === para.coluna);
+        // Classe Campeonato
+        class Campeonato {
+            constructor() {
+                this.times = TIMES.map(timeData => new Time(timeData));
+                this.rodadas = this.gerarRodadas();
+                this.rodadaAtual = 0;
+                this.partidaAtual = 0;
+                this.partida = null;
+                this.jogando = false;
+                this.pausado = false;
+                this.velocidade = 500;
+                this.acelerado = false;
+                this.atualizarTabela();
+                this.atualizarDisplayTimes();
+            }
+
+            gerarRodadas() {
+                const rodadas = [];
+                const times = this.times.map(t => t.nome);
+                
+                for (let r = 0; r < 19; r++) {
+                    const jogos = [];
+                    for (let i = 0; i < times.length/2; i++) {
+                        jogos.push([times[i], times[times.length - 1 - i]]);
+                    }
+                    rodadas.push(jogos);
+                    
+                    const ultimo = times.pop();
+                    times.splice(1, 0, ultimo);
+                }
+                
+                const returno = rodadas.map(rodada => 
+                    rodada.map(jogo => [jogo[1], jogo[0]])
+                );
+                
+                return [...rodadas, ...returno];
+            }
+
+            atualizarDisplayTimes() {
+                if (this.rodadaAtual < this.rodadas.length && this.partidaAtual < this.rodadas[this.rodadaAtual].length) {
+                    const [time1Nome, time2Nome] = this.rodadas[this.rodadaAtual][this.partidaAtual];
+                    const time1 = this.times.find(t => t.nome === time1Nome);
+                    const time2 = this.times.find(t => t.nome === time2Nome);
+                    
+                    document.getElementById('homeTeam').textContent = time1Nome;
+                    document.getElementById('awayTeam').textContent = time2Nome;
+                    
+                    if (time1.grupo === time2.grupo) {
+                        document.getElementById('colorHint').textContent = `⚡ Times com mesma cor: ${time2Nome} usará tom diferente ⚡`;
+                        document.getElementById('homeBadge').style.background = time1.cor;
+                        document.getElementById('homeBadge').textContent = time1.simbolo;
+                        document.getElementById('awayBadge').style.background = this.getVariacaoCorParaDisplay(time2);
+                        document.getElementById('awayBadge').textContent = time2.simbolo;
+                    } else {
+                        document.getElementById('colorHint').textContent = '';
+                        document.getElementById('homeBadge').style.background = time1.cor;
+                        document.getElementById('homeBadge').textContent = time1.simbolo;
+                        document.getElementById('awayBadge').style.background = time2.cor;
+                        document.getElementById('awayBadge').textContent = time2.simbolo;
+                    }
+                }
+            }
+
+            getVariacaoCorParaDisplay(time) {
+                const variacoes = {
+                    'vermelho': '#ff4444',
+                    'verde': '#00aa55',
+                    'preto': '#333333',
+                    'azul': '#2288dd',
+                    'branco': '#eeeeee'
+                };
+                return variacoes[time.grupo] || '#cccccc';
+            }
+
+            async iniciar() {
+                if (this.jogando) return;
+                this.jogando = true;
+                this.pausado = false;
+                
+                for (this.rodadaAtual = 0; this.rodadaAtual < this.rodadas.length; this.rodadaAtual++) {
+                    if (!this.jogando) break;
+                    
+                    const rodada = this.rodadas[this.rodadaAtual];
+                    document.getElementById('roundDisplay').textContent = `RODADA ${this.rodadaAtual + 1}/38`;
+                    
+                    for (this.partidaAtual = 0; this.partidaAtual < rodada.length; this.partidaAtual++) {
+                        if (this.pausado) {
+                            await this.aguardarRetomar();
+                        }
+                        
+                        const [time1Nome, time2Nome] = rodada[this.partidaAtual];
+                        const time1Obj = this.times.find(t => t.nome === time1Nome);
+                        const time2Obj = this.times.find(t => t.nome === time2Nome);
+                        
+                        this.atualizarDisplayTimes();
+                        document.getElementById('matchResult').style.display = 'none';
+                        
+                        const nomeJogo = `${time1Nome}_vs_${time2Nome}`.replace(' ', '_').replace('-', '_');
+                        
+                        this.partida = new PartidaDamas(
+                            time1Obj, 
+                            time2Obj, 
+                            () => this.renderizarTabuleiro(),
+                            (texto) => this.atualizarNarracao(texto),
+                            this.rodadaAtual + 1,
+                            nomeJogo
+                        );
+                        
+                        await this.jogarPartida();
+                        
+                        // Gerar arquivo de narração para este jogo
+                        const conteudoNarracao = this.partida.gerarArquivoNarracao();
+                        this.baixarNarracaoJogo(conteudoNarracao, nomeJogo);
+                        
+                        if (this.partida.vencedor === 'home') {
+                            time1Obj.vitorias++;
+                            time1Obj.pontos += 3;
+                            time2Obj.derrotas++;
+                            document.getElementById('matchResult').textContent = `🏆 VITÓRIA DO ${time1Nome} ${time1Obj.simbolo}`;
+                        } else if (this.partida.vencedor === 'away') {
+                            time2Obj.vitorias++;
+                            time2Obj.pontos += 3;
+                            time1Obj.derrotas++;
+                            document.getElementById('matchResult').textContent = `🏆 VITÓRIA DO ${time2Nome} ${time2Obj.simbolo}`;
+                        } else {
+                            time1Obj.empates++;
+                            time1Obj.pontos += 1;
+                            time2Obj.empates++;
+                            time2Obj.pontos += 1;
+                            document.getElementById('matchResult').textContent = `🤝 EMPATE`;
+                        }
+                        
+                        document.getElementById('matchResult').style.display = 'block';
+                        this.atualizarTabela();
+                        
+                        await this.delay(2000);
+                    }
+                }
+                
+                this.jogando = false;
+                this.mostrarFinal();
+            }
+
+            baixarNarracaoJogo(conteudo, nomeJogo) {
+                // Criar blob e download
+                const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `rodada_${this.rodadaAtual + 1}_${nomeJogo}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Mostrar mensagem
+                this.atualizarNarracao(`📥 Arquivo de narração baixado: rodada_${this.rodadaAtual + 1}_${nomeJogo}.txt`);
+            }
+
+            atualizarNarracao(texto) {
+                const narrationDiv = document.getElementById('narrationText');
+                const timestamp = new Date().toLocaleTimeString();
+                narrationDiv.innerHTML = `<span class="narration-timestamp">[${timestamp}]</span> ${texto}`;
+            }
+
+            async jogarPartida() {
+                this.renderizarTabuleiro();
+                
+                while (this.partida.emAndamento) {
+                    if (this.pausado) {
+                        await this.aguardarRetomar();
+                    }
+                    
+                    const vezTime = this.partida.vez === 'home' ? this.partida.time1 : this.partida.time2;
+                    document.getElementById('turnIndicator').textContent = `Vez: ${vezTime.simbolo} ${vezTime.nome}`;
+                    
+                    const homePecas = this.partida.contarPecas('home');
+                    const awayPecas = this.partida.contarPecas('away');
+                    document.getElementById('homeCount').textContent = `${this.partida.time1.simbolo} ${homePecas}`;
+                    document.getElementById('awayCount').textContent = `${this.partida.time2.simbolo} ${awayPecas}`;
+                    document.getElementById('moveCounter').textContent = `⚫ ${this.partida.moveCount}`;
+                    
+                    await this.partida.jogadaAutomatica();
+                    this.renderizarTabuleiro();
+                    
+                    await this.delay(this.velocidade);
+                }
+            }
+
+            renderizarTabuleiro() {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+                
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = `cell ${(i + j) % 2 === 0 ? 'light' : 'dark'}`;
+                        
+                        if (this.partida && this.partida.tabuleiro[i][j]) {
+                            const peca = this.partida.tabuleiro[i][j];
+                            const piece = document.createElement('div');
+                            
+                            let timeClass = peca.timeObj.id;
+                            if (peca.usarVariacao) {
+                                timeClass += ' variation';
+                            }
+                            
+                            piece.className = `piece ${timeClass} ${peca.dama ? 'king' : ''}`;
+                            piece.textContent = peca.timeObj.simbolo;
+                            cell.appendChild(piece);
+                        }
+                        
+                        const coord = document.createElement('span');
+                        coord.className = 'coordinates';
+                        coord.textContent = `${String.fromCharCode(65 + j)}${8 - i}`;
+                        cell.appendChild(coord);
+                        
+                        board.appendChild(cell);
+                    }
+                }
+            }
+
+            atualizarTabela() {
+                const timesOrdenados = [...this.times].sort((a, b) => {
+                    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+                    if (b.saldo !== a.saldo) return b.saldo - a.saldo;
+                    return b.pecasCapturadas - a.pecasCapturadas;
+                });
+                
+                const tbody = document.getElementById('tabelaBody');
+                tbody.innerHTML = '';
+                
+                timesOrdenados.forEach((time, index) => {
+                    const tr = document.createElement('tr');
+                    
+                    if (index === 0) tr.classList.add('campeao');
+                    else if (index < 4) tr.classList.add('g4');
+                    else if (index >= 16) tr.classList.add('z4');
+                    
+                    tr.innerHTML = `
+                        <td><strong>${index + 1}º</strong></td>
+                        <td style="text-align: left;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 25px; height: 25px; border-radius: 50%; background: ${time.cor}; display: flex; justify-content: center; align-items: center; font-size: 0.9em;">
+                                    ${time.simbolo}
+                                </div>
+                                ${time.nome}
+                            </div>
+                        </td>
+                        <td><strong>${time.pontos}</strong></td>
+                        <td>${time.vitorias}</td>
+                        <td>${time.empates}</td>
+                        <td>${time.derrotas}</td>
+                        <td>${time.saldo}</td>
+                        <td>${time.pecasCapturadas}</td>
+                        <td>${time.pecasSofridas}</td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+
+            mostrarFinal() {
+                const timesOrdenados = [...this.times].sort((a, b) => {
+                    if (b.pontos !== a.pontos) return b.pontos - a.pontos;
+                    if (b.saldo !== a.saldo) return b.saldo - a.saldo;
+                    return b.pecasCapturadas - a.pecasCapturadas;
+                });
+                
+                const campeao = timesOrdenados[0];
+                const g4 = timesOrdenados.slice(0, 4);
+                const z4 = timesOrdenados.slice(-4);
+                
+                document.getElementById('footer').innerHTML = `
+                    <div style="font-size: 2em; color: #ffd700; margin-bottom: 10px;">
+                        🏆 CAMPEÃO: ${campeao.simbolo} ${campeao.nome} ${campeao.simbolo}
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 30px; margin-top: 15px; flex-wrap: wrap;">
+                        <div style="color: #2ecc71;">
+                            <strong>G4:</strong> ${g4.map(t => `${t.simbolo} ${t.nome}`).join(' • ')}
+                        </div>
+                        <div style="color: #e74c3c;">
+                            <strong>Z4:</strong> ${z4.map(t => `${t.simbolo} ${t.nome}`).join(' • ')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            pausar() {
+                this.pausado = !this.pausado;
+                const btn = document.querySelector('.btn-pause');
+                btn.textContent = this.pausado ? '▶ RETOMAR' : '⏸ PAUSAR';
+            }
+
+            acelerar() {
+                this.acelerado = !this.acelerado;
+                this.velocidade = this.acelerado ? 200 : 500;
+                const btn = document.querySelector('.btn-speed');
+                btn.textContent = this.acelerado ? '⚡ RÁPIDO' : '⚡ NORMAL';
+            }
+
+            async aguardarRetomar() {
+                while (this.pausado) {
+                    await this.delay(100);
+                }
+            }
+
+            resetar() {
+                this.jogando = false;
+                this.pausado = false;
+                this.rodadaAtual = 0;
+                this.partidaAtual = 0;
+                this.times = TIMES.map(timeData => new Time(timeData));
+                this.partida = null;
+                this.atualizarTabela();
+                this.renderizarTabuleiro();
+                
+                document.getElementById('roundDisplay').textContent = 'RODADA 1/38';
+                document.getElementById('homeTeam').textContent = 'Flamengo';
+                document.getElementById('awayTeam').textContent = 'Palmeiras';
+                document.getElementById('homeBadge').style.background = '#e60012';
+                document.getElementById('homeBadge').textContent = '🔴';
+                document.getElementById('awayBadge').style.background = '#006437';
+                document.getElementById('awayBadge').textContent = '🟢';
+                document.getElementById('turnIndicator').textContent = 'Vez: 🔴 Flamengo';
+                document.getElementById('homeCount').textContent = '🔴 12';
+                document.getElementById('awayCount').textContent = '🟢 12';
+                document.getElementById('moveCounter').textContent = '⚫ 0';
+                document.getElementById('matchResult').style.display = 'none';
+                document.getElementById('colorHint').textContent = '';
+                document.getElementById('narrationText').innerHTML = '⚡ Narração iniciará em breve... ⚡';
+                document.getElementById('footer').innerHTML = '<span>⚡ PRONTO PARA INICIAR ⚡</span>';
+                
+                const btnPause = document.querySelector('.btn-pause');
+                btnPause.textContent = '⏸ PAUSAR';
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
         }
+
+        // Inicializar
+        window.campeonato = new Campeonato();
+        window.campeonato.renderizarTabuleiro();
     </script>
 </body>
 </html>
